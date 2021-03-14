@@ -12,7 +12,7 @@ class KmeansST:
     __max_temporal = 0.0 # [float] Maior distancia temporal na matriz de distancia
     __min_temporal = 0.0 # [float] Menor distancia temporal na matriz de distancia
     __max_espacial = 0.0 # [float] Maior distancia espacial na matriz de distancia
-    __min_especial = 0.0 # [float] Menor distancia espacial na matriz de distancia
+    __min_espacial = 0.0 # [float] Menor distancia espacial na matriz de distancia
     __velocidade_veiculo = 0.0 # [float] Velocidade do veiculo
 
 
@@ -41,6 +41,7 @@ class KmeansST:
         self.set_alpha2(alpha2)
         self.set_velocidade_veiculo(velocidade_veiculo)
         self.set_dados_clientes(dados_clientes)
+        self.calcula_maior_janela()
 
 
 
@@ -142,39 +143,112 @@ class KmeansST:
     # -----------METODOS-----------#
 
     def calcular_distancias(self):
-        clientes = self.get_dados_clientes()
 
+        #Calculo das distancias temporal e espacial
+        self.calcular_distancias_temporal_e_espacial()
+
+        #Calculo das distancias espaço temporal
+        self.calcular_distancia_espaço_temporal()
+
+
+    def calcular_distancias_temporal_e_espacial(self):
+        clientes = self.get_dados_clientes()
         linha_espacial = []
         linha_temporal = []
+
+        #Percorre todos os clientes (i)
         for cliente_i in clientes:
             coluna_espacial = []
             coluna_temporal = []
 
+            #Percorre todos os clintes (j)
             for cliente_j in clientes:
-                #Distancia Espacial
-                distancia_espacial = self.distancia_espacial(cliente_i, cliente_j)
+                # Distancia Espacial
+                distancia_espacial = self.distancia_espacial(cliente_i, cliente_j) if (cliente_i != cliente_j) else 0.0
                 coluna_espacial.append(distancia_espacial)
 
-                #Distancia Temporal
-                distancia_temporal = self.distancia_temporal(cliente_i, cliente_j)
+                # Distancia Temporal
+                distancia_temporal = self.distancia_temporal(cliente_i, cliente_j) if (cliente_i != cliente_j) else 0.0
                 coluna_temporal.append(distancia_temporal)
-                print(distancia_temporal, end=" ")
-
+                #print(distancia_temporal, end=" ")  # DEBUG
 
             linha_espacial.append(coluna_espacial)
             linha_temporal.append(coluna_temporal)
-            print()
+            #print()  # DEBUG
 
         self.__matriz_distancias_S = linha_espacial
         self.__matriz_distancias_T = linha_temporal
 
+    def calcular_distancia_espaço_temporal(self):
 
+        matriz_S = self.get_matriz_distancias_S()
+        matriz_T = self.get_matriz_distancias_T()
+        tam_matriz = len(matriz_S)
 
+        self.calcula_max_temporal()
+        self.calcula_min_temporal()
+        self.calcula_max_espacial()
+        self.calcula_min_espacial()
+        max_temporal = self.__max_temporal
+        min_temporal = self.__min_temporal
+        max_espacial = self.__max_espacial
+        min_espacial = self.__min_espacial
 
+        alpha1 = self.__alpha1
+        alpha2 = self.__alpha2
+
+        #print(f"max_t: {max_temporal}  min_t: {min_temporal}, max_s: {max_espacial}, min_s: {min_espacial}")  # DEBBUG
+
+        linhas_espaco_temporal = []
+        for i in range(tam_matriz):
+            colunas_espaco_temporal = []
+            for j in range(tam_matriz):
+
+                distancia_espacial = matriz_S[i][j]
+                distancia_temporal = matriz_T[i][j]
+                distancia_espaco_temporal = self.distancia_espaco_temporal(distancia_espacial,distancia_temporal,alpha1,alpha2,max_espacial,min_espacial,max_temporal,min_temporal)
+                colunas_espaco_temporal.append(distancia_espaco_temporal)
+
+            linhas_espaco_temporal.append(colunas_espaco_temporal)
+
+        self.__matriz_distancias_ST = linhas_espaco_temporal
+
+    #---------DISTANCIA-ESPACIAL---------#
     def distancia_espacial(self, cliente_i, cliente_j):
         return cliente_i.calcula_distancia_clientes(cliente_j)
 
+    def calcula_max_espacial(self):
+        matriz_S = self.get_matriz_distancias_S()
+        tam_matriz = len(matriz_S)
+        maior_distancia = -1 * float("inf")
+        for i in range(tam_matriz) :
+            for j in range(tam_matriz):
 
+                if( i != j and matriz_S[i][j] > maior_distancia):
+                    maior_distancia = matriz_S[i][j]
+
+
+        #print(maior_distancia) #DEBUG
+        self.__max_espacial= maior_distancia
+
+    def calcula_min_espacial(self):
+
+        matriz_S = self.get_matriz_distancias_S()
+        tam_matriz = len(matriz_S)
+        menor_distancia = float("inf")
+        for i in range(tam_matriz):
+            for j in range(tam_matriz):
+
+                if (i != j and matriz_S[i][j] < menor_distancia):
+                    menor_distancia = matriz_S[i][j]
+
+        #print(menor_distancia)  # DEBUG
+        self.__min_espacial = menor_distancia
+
+
+
+
+    #---------DISTANCIA-TEMPORAL---------#
     def distancia_temporal(self, cliente_i, cliente_j):
 
         #Parametros
@@ -182,7 +256,7 @@ class KmeansST:
         k1 = self.get_k1()
         k2 = self.get_k2()
         k3 = self.get_k3()
-        A = self.calcula_maior_janela()
+        A = self.A
 
 
         #Janela de tempo do Cliente i
@@ -206,7 +280,7 @@ class KmeansST:
         integral_normal = self.integral_normal(a_linha, b_linha, c, d, k1)
         integral_atrasado = self.integral_atrasado(a_linha, b_linha, c, d, k3)
 
-        distancia_temporal = k1*A  - (integral_antecipado + integral_normal + integral_atrasado)/(b_linha - a_linha)
+        distancia_temporal = k1*A - (integral_antecipado + integral_normal + integral_atrasado)/(b_linha - a_linha)
 
         return distancia_temporal
 
@@ -254,16 +328,53 @@ class KmeansST:
 
     def calcula_maior_janela(self):
         clientes = self.get_dados_clientes()
-        A = 0.0
+        a = 0.0
 
         for cliente in clientes:
             janela_inicio = cliente.get_janela_inicio()
             janela_fim = cliente.get_janela_fim()
-            if(janela_fim - janela_inicio > A):
-                A = janela_fim - janela_inicio
 
-        return A
+            if(janela_fim - janela_inicio > a):
+                a = janela_fim - janela_inicio
 
+        self.A = a
+
+    def calcula_max_temporal(self):
+        matriz_T = self.get_matriz_distancias_T()
+        tam_matriz = len(matriz_T)
+        maior_distancia = -1 * float("inf")
+        for i in range(tam_matriz) :
+            for j in range(tam_matriz):
+
+                if( i != j and matriz_T[i][j] > maior_distancia):
+                    maior_distancia = matriz_T[i][j]
+
+
+        #print(maior_distancia) #DEBUG
+        self.__max_temporal= maior_distancia
+
+    def calcula_min_temporal(self):
+
+        matriz_T = self.get_matriz_distancias_T()
+        tam_matriz = len(matriz_T)
+        menor_distancia = float("inf")
+        for i in range(tam_matriz):
+            for j in range(tam_matriz):
+
+                if (i != j and matriz_T[i][j] < menor_distancia):
+                    menor_distancia = matriz_T[i][j]
+
+        #print(menor_distancia)  # DEBUG
+        self.__min_temporal = menor_distancia
+
+    # ---------DISTANCIA-ESPACO-TEMPORAL---------#
+    def distancia_espaco_temporal(self, distancia_espacial, distancia_temporal, alpha1, alpha2, max_espacial, min_espacial, max_temporal, min_temporal):
+        espacial = ( distancia_espacial-min_espacial )/( max_espacial-min_espacial )
+        temporal = ( distancia_temporal-min_temporal )/( max_temporal-min_temporal )
+
+        return alpha1*espacial + alpha2*temporal
+
+    #--------PRINT-------#
 
     def print(self):
         print(f"\nk1 = {self.get_k1()}"
