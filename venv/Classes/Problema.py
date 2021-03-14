@@ -470,7 +470,7 @@ class Problema:
                 cliente_ti = rota_instantes[j]
 
                 numerador += self.beta(cliente_ti) * cliente.get_demanda()
-                print(f"Sum Freshness: {numerador}")
+                #print(f"Sum Freshness: {numerador}")
                 denominador += cliente.get_demanda()
 
 
