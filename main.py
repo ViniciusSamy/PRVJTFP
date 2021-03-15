@@ -90,7 +90,7 @@ print(f"OBJ2: {p.func_obj2(solucao1,instantes1)}")
 print("\n\n\n----------------KMeansST----------------")
 kmeans = KmeansST(1.0, 1.5, 2.0, 0.5, 0.5, velocidade_veiculo_m_s, clientes)
 
-kmeans.calcular_distancias()
+kmeans.calcular_distancias() #CORRIGIR-> Max ( DT[i][j], DT[j][i]
 kmeans.print()
 
 

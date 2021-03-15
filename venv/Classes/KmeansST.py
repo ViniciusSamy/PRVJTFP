@@ -176,8 +176,19 @@ class KmeansST:
             linha_temporal.append(coluna_temporal)
             #print()  # DEBUG
 
+
+
+        #A distância temporal deve ser espelhada ou seja distancia de i para j é iqual a distancia de j para i
+        #Essa distancia é então escolhida como o valor máximo entre i para j e j para i
+        for i in range(len(linha_temporal)):
+            for j in range(len(linha_temporal)):
+                linha_temporal[i][j] = max(linha_temporal[i][j], linha_temporal[j][i])
+
+
+        #Atribuindo matrizes de distância
         self.__matriz_distancias_S = linha_espacial
         self.__matriz_distancias_T = linha_temporal
+
 
     def calcular_distancia_espaço_temporal(self):
 
@@ -206,7 +217,12 @@ class KmeansST:
 
                 distancia_espacial = matriz_S[i][j]
                 distancia_temporal = matriz_T[i][j]
-                distancia_espaco_temporal = self.distancia_espaco_temporal(distancia_espacial,distancia_temporal,alpha1,alpha2,max_espacial,min_espacial,max_temporal,min_temporal)
+                distancia_espaco_temporal = 0.0 if(i == j) else self.distancia_espaco_temporal(
+                                                                distancia_espacial, distancia_temporal,
+                                                                alpha1,alpha2, max_espacial,min_espacial,
+                                                                max_temporal,min_temporal
+                                                                )
+
                 colunas_espaco_temporal.append(distancia_espaco_temporal)
 
             linhas_espaco_temporal.append(colunas_espaco_temporal)
@@ -244,8 +260,6 @@ class KmeansST:
 
         #print(menor_distancia)  # DEBUG
         self.__min_espacial = menor_distancia
-
-
 
 
     #---------DISTANCIA-TEMPORAL---------#
@@ -383,7 +397,7 @@ class KmeansST:
               f"\nalpha1 = {self.get_alpha1()}"
               f"\nalpha2 = {self.get_alpha2()}"
               f"\nclusters = {self.get_clusters()}"
-              f"\nMatriz_s= {self.get_matriz_distancias_S()}"
+              f"\nMatriz_s={self.get_matriz_distancias_S()}"
               f"\nMatriz_t = {self.get_matriz_distancias_T()}"
               f"\nMatriz_ST = {self.get_matriz_distancias_ST()}"
               f"\nvelocidade= {self.get_velocidade_veiculo()}"
