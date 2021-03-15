@@ -1,4 +1,5 @@
 
+print("Hello World")
 
 from Classes.Solucao import Solucao
 from Classes.Problema import Problema
@@ -28,7 +29,7 @@ nome_instancia, max_veiculos, capacidade_veiculos, clientes = ler_instancia(inst
 
 
 
-#DEFININDO O PROBLEMA
+#CRIANDO PROBLEMA
 p = Problema()
 p.set_numero_clientes(len(clientes))
 p.set_numero_max_veiculos(max_veiculos)
@@ -38,7 +39,6 @@ p.set_dados_cliente(clientes)
 p.set_velocidade_veiculo(velocidade_veiculo_m_s)
 p.set_custo_tranporte_unidade_distancia(custo_transporte_unidade_distancia)
 p.set_custo_veiculo(custo_fixo_veiculo)
-
 p.set_tempo_servico(tempo_servico_clientes)
 p.att_tempo_servico() #Atualiza o tempo de servico para todos os clientes do problema com exeção da origem
 
@@ -48,29 +48,19 @@ p.set_w3(w3)
 
 p.print()
 
-
-
-
-
-
 #GERANDO E PRINTANDO SOLUÇÂO
 solucao1 = p.criando_solucao_fixa()
 instantes1 = p.calcula_instantes_de_entrega_2(solucao1)
-
-#printa solução
-print("\n\n\n---------------SOLUCAO---------------")
 for rota in solucao1:
-    print('ROTA----------->')
+    print('----------ROTA-----------')
     for cliente in rota:
         print(cliente)
     print()
 
-#printa solução e os intantes de atendimento
-print("\n\n\n---------------SOLUCAO-E-INTANTES--------------")
 for i in range(len(solucao1)):
     rota  = solucao1[i]
     rota_instantes = instantes1[i]
-    print(f'ROTA {i}----------------------->')
+    print(f'----------------------------ROTA {i}----------------------------')
     for j in range( len(rota) ):
         print(rota[j])
         print(f'=>t[{j}]={rota_instantes[j]}\n')
@@ -79,18 +69,17 @@ for i in range(len(solucao1)):
 
 
 
-
 #p.calcula_instantes_de_entrega(solucao1)
-print("\n\n\n------------OBJETIVOS------------")
-print(f"OBJ1: {p.func_obj1(solucao1,instantes1)}")
-print(f"OBJ2: {p.func_obj2(solucao1,instantes1)}")
+print("------------")
+print(p.func_obj1(solucao1,instantes1))
+print(p.func_obj2(solucao1,instantes1)) #IMPLEMENTAR BETA
 
 
 
-print("\n\n\n----------------KMeansST----------------")
+print("----------------KMeansST----------------")
 kmeans = KmeansST(1.0, 1.5, 2.0, 0.5, 0.5, velocidade_veiculo_m_s, clientes)
 
-kmeans.calcular_distancias() #CORRIGIR-> Max ( DT[i][j], DT[j][i]
+kmeans.calcular_distancias()
 kmeans.print()
 
 
