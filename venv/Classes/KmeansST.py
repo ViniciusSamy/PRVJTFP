@@ -3,36 +3,35 @@ from Classes.Cliente import Cliente
 
 class KmeansST:
 
-
-
     #Parametros para Distancia Espaco Temporal
-    __A = 0.0 # [float] Representa a janela de maior tamanho dos clientes
-    __alpha1 = 0.0 # [float] Coeficiente que atribui peso para a distância espacial
-    __alpha2 = 0.0 # [float] Coeficiente que atribui peso para a distância temporal
-    __max_temporal = 0.0 # [float] Maior distancia temporal na matriz de distancia
-    __min_temporal = 0.0 # [float] Menor distancia temporal na matriz de distancia
-    __max_espacial = 0.0 # [float] Maior distancia espacial na matriz de distancia
-    __min_espacial = 0.0 # [float] Menor distancia espacial na matriz de distancia
-    __velocidade_veiculo = 0.0 # [float] Velocidade do veiculo
-
+    __A = 0.0  # [float] Representa a janela de maior tamanho dos clientes
+    __alpha1 = 0.0  # [float] Coeficiente que atribui peso para a distância espacial
+    __alpha2 = 0.0  # [float] Coeficiente que atribui peso para a distância temporal
+    __max_temporal = 0.0  # [float] Maior distancia temporal na matriz de distancia
+    __min_temporal = 0.0  # [float] Menor distancia temporal na matriz de distancia
+    __max_espacial = 0.0  # [float] Maior distancia espacial na matriz de distancia
+    __min_espacial = 0.0  # [float] Menor distancia espacial na matriz de distancia
+    __velocidade_veiculo = 0.0  # [float] Velocidade do veiculo
 
 
     #Parametros para distancia Temporal
-    __k1 = 0.0 # [float] parametro usado para o calculo do tempo salvo quando medimos o tempo entre dois clientes
-    __k2 = 0.0 # [float] parametro usado para o calculo do tempo salvo quando medimos o tempo entre dois clientes
-    __k3 = 0.0 # [float] parametro usado para o calculo do tempo salvo quando medimos o tempo entre dois clientes
-
+    __k1 = 0.0  # [float] parametro usado para o calculo do tempo salvo quando medimos o tempo entre dois clientes
+    __k2 = 0.0  # [float] parametro usado para o calculo do tempo salvo quando medimos o tempo entre dois clientes
+    __k3 = 0.0  # [float] parametro usado para o calculo do tempo salvo quando medimos o tempo entre dois clientes
 
 
     #Esturas de Armazenamento
-    __clusters = [] # [list of list] Armazena todos os clusters so problema.
-    __matriz_distancias_S = [] # [list of list] Armazena as distancias espaciais entre todos os cliente
-    __matriz_distancias_T = [] # [list of list] Armazena as distancias temporais entre todos os cliente
-    __matriz_distancias_ST = [] # [list of list] Armazena as distancias espaciais e temporais entre todos os cliente
-    __dados_clientes = [] # [list of list] lista que armazena os dados de cada cliente i como vetor e j um atributo desse cliente
+    __clusters = []  # [list of list] Armazena todos os clusters so problema.
+    __matriz_distancias_S = []  # [list of list] Armazena as distancias espaciais entre todos os cliente
+    __matriz_distancias_T = []  # [list of list] Armazena as distancias temporais entre todos os cliente
+    __matriz_distancias_ST = []  # [list of list] Armazena as distancias espaciais e temporais entre todos os cliente
+    __dados_clientes = []  # [list of list] lista que armazena os dados de cada cliente i como vetor e j um atributo desse cliente
+
+
 
 
     #-----------CONSTRUTOR------------#
+
     def __init__(self, k1=0.0, k2=0.0, k3=0.0, alpha1=0.0, alpha2=0.0 , velocidade_veiculo = 0.0, dados_clientes = []):
         self.set_k1(k1)
         self.set_k2(k2)
@@ -46,6 +45,7 @@ class KmeansST:
 
 
     # -----------SETTERS-----------#
+
     def set_k1(self, k1):
         # verifica tipo
         if (type(k1) is float):
@@ -105,8 +105,6 @@ class KmeansST:
 
     #-----------GETTERS-----------#
 
-
-
     def get_k1(self):
         return self.__k1
 
@@ -150,7 +148,6 @@ class KmeansST:
         #Calculo das distancias espaço temporal
         self.calcular_distancia_espaço_temporal()
 
-
     def calcular_distancias_temporal_e_espacial(self):
         clientes = self.get_dados_clientes()
         linha_espacial = []
@@ -188,7 +185,6 @@ class KmeansST:
         #Atribuindo matrizes de distância
         self.__matriz_distancias_S = linha_espacial
         self.__matriz_distancias_T = linha_temporal
-
 
     def calcular_distancia_espaço_temporal(self):
 
@@ -229,6 +225,8 @@ class KmeansST:
 
         self.__matriz_distancias_ST = linhas_espaco_temporal
 
+
+
     #---------DISTANCIA-ESPACIAL---------#
     def distancia_espacial(self, cliente_i, cliente_j):
         return cliente_i.calcula_distancia_clientes(cliente_j)
@@ -260,6 +258,7 @@ class KmeansST:
 
         #print(menor_distancia)  # DEBUG
         self.__min_espacial = menor_distancia
+
 
 
     #---------DISTANCIA-TEMPORAL---------#
@@ -381,12 +380,17 @@ class KmeansST:
         #print(menor_distancia)  # DEBUG
         self.__min_temporal = menor_distancia
 
+
+
     # ---------DISTANCIA-ESPACO-TEMPORAL---------#
     def distancia_espaco_temporal(self, distancia_espacial, distancia_temporal, alpha1, alpha2, max_espacial, min_espacial, max_temporal, min_temporal):
         espacial = ( distancia_espacial-min_espacial )/( max_espacial-min_espacial )
         temporal = ( distancia_temporal-min_temporal )/( max_temporal-min_temporal )
 
         return alpha1*espacial + alpha2*temporal
+
+
+
 
     #--------PRINT-------#
 
@@ -402,3 +406,11 @@ class KmeansST:
               f"\nMatriz_ST = {self.get_matriz_distancias_ST()}"
               f"\nvelocidade= {self.get_velocidade_veiculo()}"
               f"\ndados_clientes= {self.get_dados_clientes()}")
+
+    def print_ST(self):
+        matriz_ST = self.__matriz_distancias_ST
+
+        for i in matriz_ST:
+            for j in i:
+                print(round(j,2), end=" ")
+            print()

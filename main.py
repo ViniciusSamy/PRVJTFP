@@ -1,40 +1,50 @@
-
-print("Hello World")
-
 from Classes.Solucao import Solucao
 from Classes.Problema import Problema
 from Classes.Cliente import Cliente
 from Modulos.Funcoes import *
 from Classes.KmeansST import KmeansST
 
-##PARAMETROS
 
+
+#------------PARAMETROS------------#
+#Problema
 velocidade_veiculo_km_h = 30.0
 velocidade_veiculo_m_s = velocidade_veiculo_km_h / 3.6
 custo_transporte_unidade_distancia = 0.5
 tempo_servico_clientes = 5
 custo_fixo_veiculo = 50.0
-beta = 0.75
-
+capacidade_fixa_veiculos = 50
 
 w1 = 10
 w2 = 10
 w3 = 20
 
 beta = 0.75
+T = 720 #Life clicle (usado no calculo da função objetivo 2)
 
-##LENDO INTANCIA
+#Kmeans
+k1 = 1.0
+k2 = 1.5
+k3 = 2.0
+alpha1 = 0.5
+alpha2 = 0.5
+#----------------------------------#
+
+
+
+#----------LENDO-INTANCIA----------#
 instancia_dir = 'venv/Instancias/25/R201.txt'
 nome_instancia, max_veiculos, capacidade_veiculos, clientes = ler_instancia(instancia_dir)
+capacidade_veiculos = capacidade_fixa_veiculos
+#----------------------------------#
 
 
 
-#CRIANDO PROBLEMA
+#---------CRIANDO-PROBLEMA---------#
 p = Problema()
 p.set_numero_clientes(len(clientes))
 p.set_numero_max_veiculos(max_veiculos)
-#p.set_capacidade_veiculo(capacidade_veiculos)
-p.set_capacidade_veiculo(50)
+p.set_capacidade_veiculo(capacidade_veiculos)
 p.set_dados_cliente(clientes)
 p.set_velocidade_veiculo(velocidade_veiculo_m_s)
 p.set_custo_tranporte_unidade_distancia(custo_transporte_unidade_distancia)
@@ -46,9 +56,12 @@ p.set_w1(w1)
 p.set_w2(w2)
 p.set_w3(w3)
 
-p.print()
+p.print() #Printa Dados da Solução
+#----------------------------------#
 
-#GERANDO E PRINTANDO SOLUÇÂO
+
+
+#----GERANDO-E-PRINTANDO-SOLUÇÂO---#
 solucao1 = p.criando_solucao_fixa()
 instantes1 = p.calcula_instantes_de_entrega_2(solucao1)
 for rota in solucao1:
@@ -56,7 +69,11 @@ for rota in solucao1:
     for cliente in rota:
         print(cliente)
     print()
+#----------------------------------#
 
+
+
+#---GERANDO-E-PRINTANDO-INSTANTES--#
 for i in range(len(solucao1)):
     rota  = solucao1[i]
     rota_instantes = instantes1[i]
@@ -64,29 +81,38 @@ for i in range(len(solucao1)):
     for j in range( len(rota) ):
         print(rota[j])
         print(f'=>t[{j}]={rota_instantes[j]}\n')
+#----------------------------------#
 
 
 
+#---------FUNÇÕES=OBJETIVO---------#
+print("------OBJETIVOS------")
+print(f"OBJ1 :{p.func_obj1(solucao1,instantes1,T)}")
+print(f"OBJ2 :{p.func_obj2(solucao1,instantes1,T)}")
+#----------------------------------#
 
 
-#p.calcula_instantes_de_entrega(solucao1)
-print("------------")
-print(p.func_obj1(solucao1,instantes1))
-print(p.func_obj2(solucao1,instantes1)) #IMPLEMENTAR BETA
 
-
-
+#--------------KMEANS--------------#
 print("----------------KMeansST----------------")
-kmeans = KmeansST(1.0, 1.5, 2.0, 0.5, 0.5, velocidade_veiculo_m_s, clientes)
-
+kmeans = KmeansST(k1, k2, k3, alpha1, alpha2, velocidade_veiculo_m_s, clientes)
 kmeans.calcular_distancias()
 kmeans.print()
+kmeans.print_ST()
+#----------------------------------#
 
 
 
 
+
+
+
+
+
+
+
+#--------TESTES DAS CLASSES--------#
 #print('###########################')
-
 #solucao2 = p.criando_solucao_aleatoria_3(clientes)
 #for rota in solucao2:
 #    print('----------ROTA-----------')

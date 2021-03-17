@@ -1,12 +1,12 @@
 #prototipo
 class Cliente:
-    __indice = 0 # [int] indice do cliente
-    __x_coord = 0 # [int] coordenada x do cliente
-    __y_coord = 0 # [int] coordenada y do cliente
-    __demanda = 0 # [int] demanda do produto para o cliente
-    __janela_inicio = 0 # [int] tempo que representa o inicio da janela de tempo do cliente
-    __janela_fim = 0 # [int] tempo que representa o final da janela de tempo do cliente
-    __tempo_de_servico = 0 # [int] tempo para prestação de serviço do cliente (quando o veiculo já está no cliente)
+    __indice = 0  # [int] indice do cliente
+    __x_coord = 0  # [int] coordenada x do cliente
+    __y_coord = 0  # [int] coordenada y do cliente
+    __demanda = 0  # [int] demanda do produto para o cliente
+    __janela_inicio = 0  # [int] tempo que representa o inicio da janela de tempo do cliente
+    __janela_fim = 0  # [int] tempo que representa o final da janela de tempo do cliente
+    __tempo_de_servico = 0  # [int] tempo para prestação de serviço do cliente (quando o veiculo já está no cliente)
 
     #-----------CONSTRUTOR------------#
 
@@ -94,7 +94,6 @@ class Cliente:
         return self.__tempo_de_servico
 
     #---------FUNCOES_AUX--------#
-
     def calcula_distancia_clientes(self, cliente_2):
         if(True):
             x1 = self.get_x_coord()
@@ -107,7 +106,7 @@ class Cliente:
 
 
 
-    #-----------DEBUG----------#
+    #-----------PRINT----------#
     def __str__(self):
         return f"[ id: {self.get_indice()}, x: {self.get_x_coord()}, y: {self.get_y_coord()}, demanda: {self.get_demanda()}, janela_inicio: {self.get_janela_inicio()}, janela_fim: {self.get_janela_fim()}, tempo_servico: {self.get_tempo_de_servico()} ]"
         #return f"[id:{self.get_indice()}, x: {self.get_x_coord()}, y: {self.get_y_coord()}]"
@@ -115,7 +114,6 @@ class Cliente:
     def __repr__(self):
         #return f"[ id: {self.get_indice()}, x: {self.get_x_coord()}, y: {self.get_y_coord()}, demanda: {self.get_demanda()}, janela_inicio: {self.get_janela_inicio()}, janela_fim: {self.get_janela_fim()}, tempo_servico: {self.get_tempo_de_servico()} ]"
         return f"[id:{self.get_indice()}]"
-
 
     def print(self):
         print(f"\nindice = {self.get_indice()}"

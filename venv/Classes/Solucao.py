@@ -2,25 +2,27 @@
 class Solucao:
 
     #---------INDENTIFICADOR---------#
-    __id = 0 # [int]
+    __id = 0 # [int] indentificador da solução
 
     #---------DADOS DAS ROTAS---------#
     __tamanho_rota_por_veiculo = [] # [list] Armazena o tamanho da rota(numero de clientes visitados) de cada veiculo i alocado na solução
     __numero_veiculos = 0 # [int] numero de Veiculos Alocados
     __distancia_percorrida =0.0 # [float] distancia total percorrida
 
-    __caminho_da_solucao = [] # [list] Caminho da solução em questão ( lista de listas onde cada indice i representa um veiculo
-                            # e para cada veiculo existe outra lista e cada elemento dessa lista j respresenta um cliente
+    __caminho_da_solucao = []  # [list] Caminho da solução em questão ( lista de listas onde cada indice i representa um veiculo
+                                # e para cada veiculo existe outra lista e cada elemento dessa lista j respresenta um cliente
 
     #---------VALORES OBJETIVOS---------#
     __custo_objetivo1 = 0.0 # [float] Variável que armazena o custo associado a solução em relação ao objetivo1(min)
     __qualidade_objetivo2= 0.0 # [float] Variável que armazena o ganho de qualidade associado a uma solução em relação ao obj2(max)
 
-
     #---------VALORES CROWNDING---------#
     __crownding_distance_objetivo1 = 0.0 # [float] Como usar esse trem ?
     __crownding_distance_objetivo2 = 0.0 # [float] Como usar esse trem ?
 
+
+
+    # -----------CONSTRUTOR------------#
     def __init__(self, id):
         self.__id = id;
 
@@ -42,7 +44,6 @@ class Solucao:
             return True;
         else:
             return False;
-
 
     def set_numero_veiculos(self, numero_veiculos):
         # verifica tipo
@@ -130,7 +131,8 @@ class Solucao:
     def get_crownding_distance_objetivo2(self):
         return self.__crownding_distance_objetivo2
 
-    #-----------DEBUG-----------#
+
+    #-----------PRINT-----------#
     def print(self):
         print(f"id = {self.get_id()}"
               f"\ntamanho_rota_por_veiculo = { self.get_tamanho_rota_por_veiculo()}"
