@@ -124,3 +124,4 @@ class Cliente:
               f"\njanela_fim = {self.get_janela_fim()}"
               f"\ntempo_de_servico= {self.get_tempo_de_servico()}"
               )
+

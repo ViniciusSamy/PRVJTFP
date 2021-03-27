@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.cluster import KMeans
 from Classes.Cliente import Cliente
 
 class KmeansST:
@@ -410,7 +411,131 @@ class KmeansST:
     def print_ST(self):
         matriz_ST = self.__matriz_distancias_ST
 
+        l = 0
         for i in matriz_ST:
+            c = 0
             for j in i:
-                print(round(j,2), end=" ")
-            print()
+                print(f"{round(j,2)}[{l}][{c}]", end=" ")
+                c+=1
+            l += 1
+            print() #DEBUG
+            
+
+
+    def executar(self,k , n_iteracoes = -1):
+        convergiu = False
+
+        n_clientes = len(self.__dados_clientes)
+        indices_clientes = [ i for i in range(1,n_clientes)]
+
+        #print(indices_clientes) ## DEBUG
+        clusters = self.gerar_centros_alatorios(indices_clientes, k)
+        #print(indices_clientes) ## DEBUG
+        #print(clusters) #DEBUG
+
+        self.atribuir_clientes_cluster(indices_clientes, clusters)
+
+
+        i=0
+        while convergiu == False and (n_iteracoes == -1 or i < n_iteracoes):
+            #print(f"in:  {clusters}") #DEBUG
+            convergiu = self.recalcular_centro(clusters, convergiu)
+            #print(f"out: {clusters}") #DEBUG
+            self.reatribuir_clientes_cluster(clusters)
+            i+=1
+
+
+
+
+        #print(clusters)
+        return clusters
+
+
+
+
+
+
+    def gerar_centros_alatorios(self, indices, k):
+
+        clusters = [ [] for i in range(k)]
+
+        for i in range(k):
+            indice_aleatorio = np.random.randint(low = 0 , high = len(indices))
+            centro = indices.pop(indice_aleatorio)
+            clusters[i].append(centro)
+
+        return clusters
+
+    def atribuir_clientes_cluster(self, indices_clientes, clusters ):
+        for i in range(len(indices_clientes)):
+            i_cliente = indices_clientes.pop(0)
+            indice_clusters = self.cluster_mais_proximo(clusters, i_cliente)
+            clusters[indice_clusters].append(i_cliente)
+
+    def cluster_mais_proximo(self, clusters, indice_cliente):
+        dist = self.__matriz_distancias_ST
+        menor_distancia = float("inf")
+        indice_mais_proximo = -1
+
+        for i in range(len(clusters)):
+            indice_centro = clusters[i][0]
+            if(dist[indice_cliente][indice_centro] < menor_distancia):
+                menor_distancia = dist[indice_cliente][indice_centro]
+                indice_mais_proximo = i
+
+
+        return indice_mais_proximo
+
+    def recalcular_centro(self, clusters, convergiu):
+        convergiu = True
+        dist = self.__matriz_distancias_ST
+        # percorre os clusters
+        for cluster in clusters:
+            #print("Cluster") #DEBUG
+
+            min_soma = float("inf")
+            min_indice = -1
+
+            # percorre os elementos do cluster a iteração
+            indice = 0  # Armazena a posicao do elemento no cluster
+            for i in cluster:
+                #print(f"{i} ->", end=" ") #DEBUG
+                soma_distancias_i = 0  # Armazena a soma das distancias de um cliente i a todos os outros no mesmo cluster
+                for j in cluster:
+                    soma_distancias_i += dist[i][j]
+                    #print(f"{dist[i][j]}+", end="") #DEBUG
+                #print(f"= {soma_distancias_i}") #DEBUG
+                # Verifica se a soma das distacias é a menor até o momento
+                if (soma_distancias_i < min_soma):
+                    min_soma = soma_distancias_i
+                    #print(min_soma) #DEBUG
+                    min_indice = indice
+
+                indice += 1  # incrementa o indice da iteração
+
+            # Verifica se o centro foi alterado (o centro é sempre a primeira posição '[0]')
+            if (min_indice != 0):
+                convergiu = False
+                aux = cluster[0]
+                cluster[0] = cluster[min_indice]
+                cluster[min_indice] = aux
+
+
+        return convergiu
+
+    def reatribuir_clientes_cluster(self, clusters):
+        indices_clientes = []
+        for cluster in clusters:
+            for i in range(1, len(cluster)):
+                i_cliente = cluster.pop(1)
+                indices_clientes.append(i_cliente)
+
+        #print(indices_clientes)
+        #print(clusters)
+
+        for i in range(len(indices_clientes)):
+            i_cliente = indices_clientes.pop(0)
+            indice_clusters = self.cluster_mais_proximo(clusters, i_cliente)
+            clusters[indice_clusters].append(i_cliente)
+        #print(clusters) #DEBUG
+        #print() #DEBUG

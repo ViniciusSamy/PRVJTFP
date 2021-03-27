@@ -185,6 +185,7 @@ class Problema:
 
 
     #------------CRIAÇÃO-DE-SOLUÇÕES-----------#
+    #--------->ALEATORIA
     #Criando Solução Aleatoria respeitando as Demandas
     def criando_solucao_aleatoria(self):
         ##!!!!!!NÂO CONSIDERA DISTÂNCIAS NA GERAÇÃO
@@ -251,6 +252,157 @@ class Problema:
             #print(rota) #DEBUG
 
         return solucao
+
+    #--------->CLUSTERIZADO
+    #criando solucao a partir dos clusters (KMEANS)
+    def criando_solucao_clusterizada(self, clusters, matriz_distancias):
+        dados_clientes = self.__dados_cliente
+        capacidade_veiculo = self.get_capacidade_veiculo()
+
+        #Copiando clusters (para não alterar fora da função)
+        clusters = list(clusters)
+        for i in range(len(clusters)):
+            clusters[i] = list(clusters[i])
+
+        #Solução (conjunto de rotas
+        solucao = []
+
+        #Rota do veiculo e demanda acumulada desse veiculo
+        rota = []
+        demanda_atual = 0
+
+        #Continua enquanto houverem elementos no clusters (precisam ser adicionados
+        while len(clusters) > 0:
+
+            #Lista com os clusters já percorridos por uma rota
+            clusters_percorridos = []
+
+            #Indice cluster a ser adicionado a solução (começa pelo primeiro)
+            indice_cluster = 0
+
+            #Variavel que armazena o ultimo cliente adicionado a rota
+            ultimo_cliente = 0 #começa pela origem
+
+
+
+            # Indica que o cluster já foi visitado
+            clusters_percorridos.append(indice_cluster)
+            # Copia o cluster da iteração somente para avaliar os clientes
+            cluster_iteracao = list(clusters[indice_cluster])
+            while True:
+
+
+                #print(f"CLUSTER itr = {cluster_iteracao}") #DEBUG
+
+
+                #Busca o cliente mais próximo ao ultimo cliente adicionado dentro do cluster da iteração
+                indice_cliente = self.mais_proximo_cluster(ultimo_cliente, cluster_iteracao, matriz_distancias)
+                cliente = cluster_iteracao.pop(indice_cliente)
+
+                # Verifica se atende a demanda e caso atenda é adiconado a rota do veiculo
+                if (dados_clientes[cliente].get_demanda() + demanda_atual <= capacidade_veiculo):
+
+                    #Adiciona a rota e atualiza demanda do veiculo
+                    rota.append(dados_clientes[cliente])
+                    demanda_atual += dados_clientes[cliente].get_demanda()
+
+                    #Retira o elemento dos clusters (o original e não o cluster da iteração)
+                    clusters[indice_cluster].remove(cliente)
+
+                    #Define o ultimo cliente adicionado
+                    ultimo_cliente = cliente
+
+
+                #Verifica se o cluster atual ainda possui elementos, caso não haja passa para o mais próximo do ultimo cliente ( que ainda nao foi percorrido)
+                if (len(cluster_iteracao) <= 0):
+                    indice_cluster = self.cluster_mais_proximo(ultimo_cliente, clusters, clusters_percorridos, matriz_distancias)
+                    # Indica que o cluster já foi visitado
+                    clusters_percorridos.append(indice_cluster)
+                    # Copia o cluster da iteração somente para avaliar os clientes
+                    cluster_iteracao = list(clusters[indice_cluster])
+                    #print (f"indice Cluster {indice_cluster}") #DEBUG
+
+
+
+
+                #CONDICAO DE PARADA DO WHILE
+                if( len(clusters_percorridos) >= len(clusters) ):
+                    #Adiciona a rota a solucao
+                    solucao.append(rota)
+                    #print(f"ROTA{rota}") #DEBUG
+                    #Definindo um nova rota
+                    demanda_atual = 0
+                    rota = []
+
+
+                    break;
+
+            #Remove os clusters que não possuem mais nenhum cliente(vazios)
+            self.retirar_clusters_vazios(clusters)
+
+
+
+
+
+
+
+
+        return solucao
+
+    #Procura o cliente mais proximo ao ultimo clientente adicionado em um certo cluster
+    def mais_proximo_cluster(self, i ,cluster, matriz_distancias):
+        min_distancia = float("inf")
+        indice_min = 0
+        indice = 0
+
+        for j in cluster:
+            # print(f"[{j}]->{matriz_distancias[i][j]} < {min_distancia} = {matriz_distancias[i][j] < min_distancia}") #DEBUG
+            if(matriz_distancias[i][j] < min_distancia):
+
+                min_distancia = matriz_distancias[i][j]
+                indice_min = indice
+
+
+            indice += 1
+
+        return indice_min
+
+    def retirar_clusters_vazios(self, clusters):
+        #clusters_vazios = []
+        i = 0
+        while( i < len(clusters) ):
+
+            if(len(clusters[i]) <= 0 ):
+                clusters.pop(i)
+                i -= 1 #Retrocede o iterador (numero de clusters diminui)
+
+            i += 1
+
+
+
+        #clusters.pop(clusters_vazios)
+        #for i in clusters_vazios:
+         #  clusters.pop(i)
+
+    #Verifica qual o cluster ainda não visitado mais proximo do ultimo cliente adicionado
+    def cluster_mais_proximo(self, indice_cliente, clusters, clusters_percorridos, matriz_distancias):
+        min_distancia = float("inf")
+        indice_cluster_min = -1
+
+        for i in range(len(clusters)):
+
+            #Se ainda não foi percorrido
+            if( i not in clusters_percorridos):
+
+                for j in clusters[i]:
+
+                    if(matriz_distancias[indice_cliente][j] < min_distancia):
+                        min_distancia = matriz_distancias[indice_cliente][j]
+                        indice_cluster_min = i
+
+
+        return indice_cluster_min
+
 
 
 
@@ -465,7 +617,6 @@ class Problema:
         # print(instantes_entregas_solucao); #DEBUG
 
         return instantes_entregas_solucao
-
 
 
 

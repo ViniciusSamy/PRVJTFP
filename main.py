@@ -23,6 +23,8 @@ beta = 0.75
 T = 720 #Life clicle (usado no calculo da função objetivo 2)
 
 #Kmeans
+k_clusters = 4; #numero de clusters
+lim_iteracoes = -1 ; #limite de interações (-1)->Sem limite
 k1 = 1.0
 k2 = 1.5
 k3 = 2.0
@@ -98,9 +100,23 @@ print("----------------KMeansST----------------")
 kmeans = KmeansST(k1, k2, k3, alpha1, alpha2, velocidade_veiculo_m_s, clientes)
 kmeans.calcular_distancias()
 kmeans.print()
-kmeans.print_ST()
+#kmeans.print_ST()
+clusters = kmeans.executar(k_clusters, lim_iteracoes)
+matriz_ST = kmeans.get_matriz_distancias_ST()
+
 #----------------------------------#
 
+#----GERANDO-E-PRINTANDO-SOLUÇÂO---#
+
+
+solucao2 = p.criando_solucao_clusterizada(clusters, matriz_ST)
+for rota in solucao2:
+    print('----------ROTA-----------')
+    for cliente in rota:
+        print(cliente)
+    print()
+print(clusters)
+#----------------------------------#
 
 
 
@@ -154,6 +170,10 @@ kmeans.print_ST()
 #v3 = [8, 11, 9, 12]
 #caminho = []
 #caminho.append(v1)
+custo_fixo_veiculo = 50.0
+capacidade_fixa_veiculos = 50
+
+w1 = 10
 #caminho.append(v2)
 #caminho.append(v3)
 #tam_rota = [len(v1),len(v2), len(v3)]
