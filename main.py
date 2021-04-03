@@ -3,6 +3,8 @@ from Classes.Problema import Problema
 from Classes.Cliente import Cliente
 from Modulos.Funcoes import *
 from Classes.KmeansST import KmeansST
+from math import ceil
+from pymoo.factory import get_algoritmh
 
 
 
@@ -63,6 +65,7 @@ p.print() #Printa Dados da Solução
 
 
 
+
 #----GERANDO-E-PRINTANDO-SOLUÇÂO---#
 solucao1 = p.criando_solucao_fixa()
 instantes1 = p.calcula_instantes_de_entrega_2(solucao1)
@@ -101,14 +104,16 @@ kmeans = KmeansST(k1, k2, k3, alpha1, alpha2, velocidade_veiculo_m_s, clientes)
 kmeans.calcular_distancias()
 kmeans.print()
 #kmeans.print_ST()
+demanda_total = p.get_demanda_total()
+
+k_clusters = ceil( p.get_demanda_total()/p.get_capacidade_veiculo())
 clusters = kmeans.executar(k_clusters, lim_iteracoes)
+
 matriz_ST = kmeans.get_matriz_distancias_ST()
 
 #----------------------------------#
 
 #----GERANDO-E-PRINTANDO-SOLUÇÂO---#
-
-
 solucao2 = p.criando_solucao_clusterizada(clusters, matriz_ST)
 for rota in solucao2:
     print('----------ROTA-----------')
@@ -120,8 +125,10 @@ print(clusters)
 
 
 
+#-----------TESTE-PYMOO------------#
 
-
+rot_pymoo.run()
+#----------------------------------#
 
 
 
@@ -170,10 +177,10 @@ print(clusters)
 #v3 = [8, 11, 9, 12]
 #caminho = []
 #caminho.append(v1)
-custo_fixo_veiculo = 50.0
-capacidade_fixa_veiculos = 50
+#custo_fixo_veiculo = 50.0
+#capacidade_fixa_veiculos = 50
 
-w1 = 10
+#w1 = 10
 #caminho.append(v2)
 #caminho.append(v3)
 #tam_rota = [len(v1),len(v2), len(v3)]

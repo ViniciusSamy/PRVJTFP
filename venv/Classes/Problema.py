@@ -180,6 +180,13 @@ class Problema:
     def get_w3(self):
         return self.__w3
 
+    def get_demanda_total(self):
+        demanda_total =0
+
+        for cliente in self.__dados_cliente:
+            demanda_total += cliente.get_demanda()
+
+        return  demanda_total
 
 
 

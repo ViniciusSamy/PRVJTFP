@@ -447,7 +447,10 @@ class KmeansST:
 
 
 
-        #print(clusters)
+        self.__clusters = list(clusters)
+        for i in range(len(clusters)):
+            self.__clusters[i] = list(clusters[i])
+
         return clusters
 
 
