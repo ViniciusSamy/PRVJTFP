@@ -3,6 +3,7 @@ import numpy as np
 from Classes.Cliente import Cliente
 
 class Problema:
+
     __numero_max_veiculos = 0  # [int] numero de veiculos
     __capacidade_veiculo = 0 # [int] capacidade de cada veiculo (frota homogenea)
     __velocidade_veiculo = 0.0  # [float] Respresenta uma velocidade constante para os veiculos
@@ -138,6 +139,19 @@ class Problema:
             t_servico = tempo_de_servico if cliente.get_tempo_de_servico() > 0 else 0  # Manter a origem sem tempo de servico
             cliente.set_tempo_de_servico(t_servico)
 
+    def att_janelas_de_tempo(self, operador):
+        for cliente in self.__dados_cliente:
+            janela_inicio = cliente.get_janela_inicio()
+            janela_inicio = janela_inicio * operador
+            cliente.set_janela_inicio(janela_inicio)
+
+            janela_fim = cliente.get_janela_fim()
+            janela_fim = janela_fim * operador
+            cliente.set_janela_fim(janela_fim)
+
+            tempo_servico = cliente.get_tempo_de_servico()
+            tempo_servico = tempo_servico * operador
+            cliente.set_tempo_de_servico(tempo_servico)
 
     #------------GETTERS-----------#
 
@@ -276,6 +290,7 @@ class Problema:
 
         #Rota do veiculo e demanda acumulada desse veiculo
         rota = []
+        rota.append(dados_clientes[0])
         demanda_atual = 0
 
         #Continua enquanto houverem elementos no clusters (precisam ser adicionados
@@ -336,10 +351,12 @@ class Problema:
                 if( len(clusters_percorridos) >= len(clusters) ):
                     #Adiciona a rota a solucao
                     solucao.append(rota)
+                    rota.append(dados_clientes[0])
                     #print(f"ROTA{rota}") #DEBUG
                     #Definindo um nova rota
                     demanda_atual = 0
                     rota = []
+                    rota.append(dados_clientes[0])
 
 
                     break;
@@ -416,8 +433,10 @@ class Problema:
     #------------OBJETIVOS-----------#
 
     #Calcula a função objetivo 1 para uma dada solução ( utiliza-se de seus instantes de entrega )
-    def func_obj1(self, solucao, instantes,T):
+    def func_obj1(self, solucao, instantes):
         solucao_cpy =  list(solucao) # copia da solução
+
+        T = self.get_ciclo_de_vida_produto()
 
         t1=0
         t2=0
@@ -428,13 +447,8 @@ class Problema:
         sum_1 = 0.0 #custo dos veiculos dados os km
         custo_por_unidade = self.get_custo_tranporte_unidade_distancia()  # Custo por unidade percorrida do veiculo
         for i in range(len(solucao_cpy)):
-
             rota= solucao[i]
-            #print()
-
             for j in range(len(rota) - 1):
-
-
                 cliente_atual = rota[j]
                 cliente_proximo = rota[j+1]
 
@@ -479,8 +493,8 @@ class Problema:
         sum_4 = sum_4 * w2
         print(f"Soma Adianto(W1): {sum_3}")  # DEBUG
         print(f"Soma Atraso(W2): {sum_4}")  # DEBUG
-        print(f"t1: {t1}")
-        print(f"t2: {t2}")
+        #print(f"t1: {t1}")
+        #print(f"t2: {t2}")
 
 
         # -------Soma do custo pelos danos aos produtos no instante de entrega-------#
@@ -493,7 +507,7 @@ class Problema:
             for j in range(len(rota) - 1):
                 cliente = rota[j]
                 cliente_demanda = cliente.get_demanda()
-                cliente_instante_entrega = instantes[i][j]
+                cliente_instante_entrega = max(instantes[i][j],cliente.get_janela_inicio())
 
                 sum_5 += self.phi(cliente_instante_entrega,T)*cliente_demanda
 
@@ -508,11 +522,12 @@ class Problema:
 
 
 
-        ###################OBJ2 FALTA IMPLETEMNTAR
+        ###################OBJ2
 
     # Calcula a função objetivo 1 para uma dada solução ( utiliza-se de seus instantes de entrega )
-    def func_obj2(self, solucao, instantes, T):
+    def func_obj2(self, solucao, instantes  ):
 
+        T = self.get_ciclo_de_vida_produto()
 
         numerador = 0.0
         denominador = 0.0
@@ -523,10 +538,9 @@ class Problema:
 
             for j in range(len(rota)):
                 cliente = rota[j]
-                cliente_ti = rota_instantes[j]
+                cliente_ti = max(rota_instantes[j],cliente.get_janela_inicio())
 
                 numerador += self.beta(cliente_ti,T) * cliente.get_demanda()
-                print(f"Sum Freshness: {numerador}")
                 denominador += cliente.get_demanda()
 
 
@@ -537,10 +551,62 @@ class Problema:
         return np.exp(((np.log(2) / T) * instante)) - 1
 
     def beta(self, instante, T):
-        return 1 - (self.phi(instante, T))
+        beta = 1 - (self.phi(instante, T))
+        beta = 0.0 if ( beta < 0) else beta #se beta negativo
+
+        return beta
+
+
+
+    # ----------OBJETIVOS-ARRAY-NUMPY---------#
+    def objs(self, array_solucao):
+
+        solucao = self.converte_array_solucao(array_solucao)
+
+        instantes = self.calcula_instantes_de_entrega_1(solucao)
+
+        obj1 = self.func_obj1_alt(solucao, instantes)
+        obj2 = self.func_obj2_alt(solucao, instantes)
+
+        return obj1, obj2
+
+
+    def converte_array_solucao(self, array_solucao):
+
+        clientes = list(self.get_dados_cliente())
+        capacidade_veiculo = self.get_capacidade_veiculo()
+
+        solucao = []
+        rota = []
+        demanda_rota = 0
+
+        rota.append(clientes[0])
+
+        for k in array_solucao:
+            cliente = clientes[k]
+
+            if (demanda_rota + cliente.get_demanda() <= capacidade_veiculo):
+                rota.append(cliente)
+                demanda_rota += cliente.get_demanda()
+
+            else:
+                rota.append(clientes[0])
+                solucao.append(rota)
+
+                rota = []
+                demanda_rota = 0
+                tempo_acumulado = 0
+                rota.append(clientes[0])
+
+                rota.append(cliente)
+                demanda_rota += cliente.get_demanda()
+
+        rota.append(clientes[0])
+        solucao.append(rota)
+        return solucao
 
     # Retorna uma lista de lista com os instantes em que os clientes foram atendidos em um dada solucao
-    # Um mesmo posição tanto nos instantes quanto na solução correspondem a um mesmo cliente
+    # Uma mesma posição(i,j) tanto nos instantes quanto na solução correspondem aos dados de um mesmo cliente
     def calcula_instantes_de_entrega(self, solucao):
         # !!!!!!! PRIMEIRO INSTANTE DA ROTA É IGUAL A JANELA DE TEMPO DO PRIMEIRO CLIENTE
 
@@ -592,7 +658,6 @@ class Problema:
                 # Calcula o tempo acumulado entre o cliente atual e o anterior
                 tempo_acumulado = tempo_acumulado + cliente_anterior_t_servico + tempo_entre_clientes + tempo_espera
 
-
                 #Atualiza o cliente anterior e o proximo
                 cliente_anterior = cliente_atual #Cliente atual passa a ser o anterior
 
@@ -624,6 +689,7 @@ class Problema:
         # print(instantes_entregas_solucao); #DEBUG
 
         return instantes_entregas_solucao
+
 
 
 
@@ -961,6 +1027,88 @@ class Problema:
 
         return solucao
 
+
+    #[PADRÃO]
+    def calcula_instantes_de_entrega_1(self, solucao):
+
+        solucao_copia = list(solucao); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+        instantes_entregas_solucao = [] #armazena os instantes de entrega de toda a solução
+
+
+        i_rota = 0 #Armazena a rota(veiculo) da iteração
+
+        for i_rota in range(len(solucao)) :
+            rota_clientes_nao_calculados = list(solucao[i_rota])
+
+            instantes_entregas_rota = []  # armazena os intantes de entrega de toda a rota
+
+            tempo_acumulado = 0  # tempo acumulado até o momento
+
+
+            #Estabelecendo os primeiro clientes da rota a tere instantes acumulados
+            cliente_anterior = rota_clientes_nao_calculados.pop(0)  # pegando primeiro cliente(origem) da rota da iteração e remove ele
+            cliente_anterior_t_servico = cliente_anterior.get_tempo_de_servico()  # tempo de serviço do cliente da iteração
+            cliente_atual = rota_clientes_nao_calculados.pop(0)  # pegando primeiro cliente(id:1) da rota da iteração e remove ele
+            distancia_clientes = cliente_atual.calcula_distancia_clientes(cliente_anterior) #calcula a distancia entre os clientes
+
+            velocidade_veiculo = self.get_velocidade_veiculo()
+
+
+            ##Calcula os instantes de atendimeto de cada cliente da rota
+            for i_cliente in range( len(rota_clientes_nao_calculados) ):
+
+                # Adiciona o instante de entrega do cliente anterior
+                instantes_entregas_rota.append(tempo_acumulado)
+
+                # Calcula tempo entre cliente anterior e o atual (CONVERTE VELOCIDADE DE KM/H PARA M/S)
+                tempo_entre_clientes = distancia_clientes / (velocidade_veiculo)
+
+                #Calcula o tempo de espera que houve no cliente anterior se houver
+                janela_inicio_cliente_anterior = cliente_anterior.get_janela_inicio()
+                tempo_espera = 0 if( tempo_acumulado >= janela_inicio_cliente_anterior ) else janela_inicio_cliente_anterior - tempo_acumulado
+
+                # Calcula o tempo acumulado entre o cliente atual e o anterior
+                tempo_acumulado = tempo_acumulado + cliente_anterior_t_servico + tempo_entre_clientes + tempo_espera
+
+                #Atualiza o cliente anterior e o proximo
+                cliente_anterior = cliente_atual #Cliente atual passa a ser o anterior
+
+                cliente_anterior_t_servico = cliente_anterior.get_tempo_de_servico() #Atualiza o temp ode serviço do cliente anterior
+
+                cliente_atual = rota_clientes_nao_calculados.pop(0) #Cliente atual é agora o proximo cliente (primeiro da list de rota)
+
+                distancia_clientes = cliente_atual.calcula_distancia_clientes(cliente_anterior) # Atualiza a distancia entre esses clientes
+
+
+
+
+            instantes_entregas_rota.append(tempo_acumulado) #adiciona o instante de entreg do ultimo cliente da rota
+
+
+            ##Calcula e adiciona instante do ultimo cliente (origem)
+            tempo_entre_clientes = distancia_clientes / velocidade_veiculo
+
+            # Calcula o tempo de espera que houve no cliente anterior se houver
+            janela_inicio_cliente_anterior = cliente_anterior.get_janela_inicio()
+            tempo_espera = 0 if (
+                        tempo_acumulado >= janela_inicio_cliente_anterior) else janela_inicio_cliente_anterior - tempo_acumulado
+
+            # Calcula o tempo acumulado entre o cliente atual e o anterior
+            tempo_acumulado = tempo_acumulado + cliente_anterior_t_servico + tempo_entre_clientes + tempo_espera
+
+            instantes_entregas_rota.append(tempo_acumulado)  # adiciona o instante de entreg do ultimo cliente da rota
+
+
+
+            # print(instantes_entregas_rota) #DEBUG
+            instantes_entregas_solucao.append(instantes_entregas_rota) #Adiciona os instantes da rota aos instantes da solução
+
+
+
+        return instantes_entregas_solucao
+
+    #Se o veiculo chega antes da janela de tempo de um cliente ele espera ate o inicio
+    #e para os demais clientes ele ignora as janelas e atende no momento da chegada
     def calcula_instantes_de_entrega_2(self, solucao):
         # !!!!!!! PRIMEIRO INSTATE DA ROTA É IGUAL A JANELA DE TEMPO DO PRIMEIRO CLIENTE
 
@@ -1057,3 +1205,210 @@ class Problema:
 
 
         #print(clientes_rota);
+
+    #Se um veiculo chega antes ele pode atender o cliente imediatamente
+    def calcula_instantes_de_entrega_3(self, solucao):
+        # !!!!!!! PRIMEIRO INSTANTE DA ROTA É IGUAL A JANELA DE TEMPO DO PRIMEIRO CLIENTE
+
+        solucao_copia = list(solucao); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+
+
+
+
+        instantes_entregas_solucao = [] #armazena os instantes de entrega de toda a solução
+
+
+        #i_rota = 0 #Armazena a rota(veiculo) da iteração
+
+        for i_rota in range(len(solucao)) :
+            rota_clientes_nao_calculados = list(solucao[i_rota])
+
+            instantes_entregas_rota = []  # armazena os intantes de entrega de toda a rota
+
+            tempo_acumulado = 0  # tempo acumulado até o momento
+
+            tempo_espera = 0 #Caso um veiculo chege antes do inicio da janela de tempo de um cliente sua janela de tempo é cosiderada no atendimento do seus sucessor
+
+
+            #Estabelecendo os primeiro clientes da rota a tere instantes acumulados
+            cliente_anterior = rota_clientes_nao_calculados.pop(0)  # pegando primeiro cliente(origem) da rota da iteração e remove ele
+            cliente_anterior_t_servico = cliente_anterior.get_tempo_de_servico()  # tempo de serviço do cliente da iteração
+
+            cliente_atual = rota_clientes_nao_calculados.pop(0)  # pegando primeiro cliente(id:1) da rota da iteração e remove ele
+
+            distancia_clientes = cliente_atual.calcula_distancia_clientes(cliente_anterior) #calcula a distancia entre os clientes
+
+            velocidade_veiculo = self.get_velocidade_veiculo();
+
+
+            ##Calcula os instantes de atendimeto de cada cliente da rota
+            for i_cliente in range( len(rota_clientes_nao_calculados) ):
+
+
+                # Adiciona o instante de entrega do cliente anterior
+                instantes_entregas_rota.append(tempo_acumulado)
+
+                # Calcula tempo entre cliente anterior e o atual (CONVERTE VELOCIDADE DE KM/H PARA M/S)
+                tempo_entre_clientes = distancia_clientes / (velocidade_veiculo)
+
+                #Calcula o tempo de espera que houve no cliente anterior se houver
+                janela_inicio_cliente_anterior = cliente_anterior.get_janela_inicio()
+                tempo_espera = 0 if( tempo_acumulado >= janela_inicio_cliente_anterior ) else janela_inicio_cliente_anterior - tempo_acumulado
+
+                # Calcula o tempo acumulado entre o cliente atual e o anterior
+                tempo_acumulado = tempo_acumulado + cliente_anterior_t_servico + tempo_entre_clientes
+
+                #Atualiza o cliente anterior e o proximo
+                cliente_anterior = cliente_atual #Cliente atual passa a ser o anterior
+
+                cliente_anterior_t_servico = cliente_anterior.get_tempo_de_servico() #Atualiza o temp ode serviço do cliente anterior
+
+                cliente_atual = rota_clientes_nao_calculados.pop(0) #Cliente atual é agora o proximo cliente (primeiro da list de rota)
+
+                distancia_clientes = cliente_atual.calcula_distancia_clientes(cliente_anterior) # Atualiza a distancia entre esses clientes
+
+
+
+
+            instantes_entregas_rota.append(tempo_acumulado) #adiciona o instante de entreg do ultimo cliente da rota
+
+
+            ##Calcula e adiciona instante do ultimo cliente (origem)
+            tempo_entre_clientes = distancia_clientes / velocidade_veiculo  # Calcula tempo entre cliente anterior e o atual
+
+            tempo_acumulado = tempo_acumulado + cliente_anterior_t_servico + tempo_entre_clientes  # Calcula o tempo acumulado entre o cliente atual e o anterior
+
+            instantes_entregas_rota.append(tempo_acumulado)  # adiciona o instante de entreg do ultimo cliente da rota
+
+
+
+            # print(instantes_entregas_rota) #DEBUG
+            instantes_entregas_solucao.append(instantes_entregas_rota) #Adiciona os instantes da rota aos instantes da solução
+
+
+        # print(instantes_entregas_solucao); #DEBUG
+
+        return instantes_entregas_solucao
+
+
+
+    #Calcula a função objetivo 1 para uma dada solução ( utiliza-se de seus instantes de entrega )
+    def func_obj1_alt(self, solucao, instantes):
+        solucao_cpy =  list(solucao) # copia da solução
+
+        T = self.get_ciclo_de_vida_produto()
+
+        t1=0
+        t2=0
+        t3=0
+
+
+        #-------Soma do custo por unidade percorrida do veiculo-------#
+        sum_1 = 0.0 #custo dos veiculos dados os km
+        custo_por_unidade = self.get_custo_tranporte_unidade_distancia()  # Custo por unidade percorrida do veiculo
+        for i in range(len(solucao_cpy)):
+            rota= solucao[i]
+            for j in range(len(rota) - 1):
+                cliente_atual = rota[j]
+                cliente_proximo = rota[j+1]
+
+                sum_1 += cliente_atual.calcula_distancia_clientes(cliente_proximo) * custo_por_unidade
+        #print(f"Soma Custo transporte: {sum_1}") #DEBUG
+
+
+        # -------Soma do custo pelo numero de veiculos alocados-------#
+        sum_2 = 0.0 #custo dado o numero de veiculos da solucao
+        n_veiculos = len(solucao)
+        custo_por_veiculo = self.get_custo_veiculo()
+        sum_2 = n_veiculos * custo_por_veiculo
+        #print(f"Soma numero veiculos: {sum_2}")  # DEBUG
+
+
+        # -------Soma do custo pelo adiantamento e ultrapassagem das janelas-------#
+        sum_3 = 0.0 #Soma referente ao adiantamento das janelas
+        w1 = self.get_w1() #Coeficiente de adiantamento
+
+        sum_4 = 0.0  # Soma referente a ultrapassagem das janelas
+        w2 = self.get_w2()  # Coeficiente de ultrapassagem
+
+        #Percorre clientes da solução
+        for i in range(len(solucao_cpy)):
+            rota = solucao_cpy[i]
+            for j in range(len(rota) - 1): #Não considera a janela de tempo quando o veiculo volta a origem
+                cliente = rota[j]
+                cliente_janela_inicio = cliente.get_janela_inicio()
+                cliente_janela_fim = cliente.get_janela_fim()
+                cliente_instante_entrega = instantes[i][j]
+
+                sum_3 += 0.0 if (cliente_instante_entrega >= cliente_janela_inicio) else cliente_janela_inicio - cliente_instante_entrega #Só adiciona se houver um adiantamento
+                sum_4 += 0.0 if (cliente_janela_fim >= cliente_instante_entrega) else cliente_instante_entrega - cliente_janela_fim  # Só adiciona se houver uma ultrapassagem
+
+                t1 += 0.0 if (cliente_instante_entrega >= cliente_janela_inicio) else 1
+
+                t2 += 0.0 if (cliente_janela_fim >= cliente_instante_entrega) else 1
+
+
+
+        #aplicando coeficientes
+        sum_3 = (sum_3/1) * w1
+        sum_4 = (sum_4/1) * w2
+        #print(f"Soma Adianto(W1): {sum_3}")  # DEBUG
+        #print(f"Soma Atraso(W2): {sum_4}")  # DEBUG
+        #print(f"t1: {t1}")
+        #print(f"t2: {t2}")
+
+
+        # -------Soma do custo pelos danos aos produtos no instante de entrega-------#
+        sum_5 = 0 #Armazena a soma de danos ao produto
+        w3 = self.get_w3()  # Coeficiente dos danos
+
+        # Percorre clientes da solução
+        for i in range(len(solucao_cpy)):
+            rota = solucao_cpy[i]
+            for j in range(len(rota) - 1):
+                cliente = rota[j]
+                cliente_demanda = cliente.get_demanda()
+                cliente_instante_entrega = max(instantes[i][j],cliente.get_janela_inicio())
+
+                sum_5 += self.phi(cliente_instante_entrega,T)*cliente_demanda
+
+
+        sum_5 = sum_5*w3
+        #print(f"Soma danos(W3):  {sum_5}")  # DEBUG
+
+        return sum_1+sum_2+sum_3+sum_4+sum_5
+
+
+
+
+
+
+
+        ###################OBJ2
+
+    # Calcula a função objetivo 1 para uma dada solução ( utiliza-se de seus instantes de entrega )
+    def func_obj2_alt(self, solucao, instantes  ):
+
+        T = self.get_ciclo_de_vida_produto()
+        dados_cliente = self.__dados_cliente
+
+        numerador = 0.0
+        denominador = 0.0
+
+        for i in range(len(solucao)):
+            rota = solucao[i]
+            rota_instantes = instantes[i]
+
+            for j in range(len(rota)):
+                cliente = rota[j]
+
+                #instante de atendimento é igual a janela de tempo em caso de adiantamento
+                cliente_ti = max(rota_instantes[j],cliente.get_janela_inicio())
+
+                numerador += self.beta(cliente_ti,T) * cliente.get_demanda()
+                #print(f"Sum Freshness: {numerador}")
+                denominador += cliente.get_demanda()
+
+
+        obj2 = numerador/denominador
+        return obj2

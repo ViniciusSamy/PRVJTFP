@@ -4,7 +4,9 @@ from Classes.Cliente import Cliente
 from Modulos.Funcoes import *
 from Classes.KmeansST import KmeansST
 from math import ceil
-from pymoo.factory import get_algoritmh
+import numpy as np
+import Classes.Pymoo.rotina_pymoo as algoritmo_pymoo
+from FuncoesAuxiliares import write_res
 
 
 
@@ -17,12 +19,14 @@ tempo_servico_clientes = 5
 custo_fixo_veiculo = 50.0
 capacidade_fixa_veiculos = 50
 
-w1 = 10
-w2 = 10
-w3 = 20
+w1 = 1
+w2 = 1
+w3 = 2
 
-beta = 0.75
-T = 720 #Life clicle (usado no calculo da função objetivo 2)
+beta = 0.75 #Valor minimo da função beta de aceitação de um cliente
+T = 12.0 #Life clicle (usado no calculo da função objetivo 2)
+
+
 
 #Kmeans
 k_clusters = 4; #numero de clusters
@@ -37,7 +41,8 @@ alpha2 = 0.5
 
 
 #----------LENDO-INTANCIA----------#
-instancia_dir = 'venv/Instancias/25/R201.txt'
+instancia_dir = 'venv/Instancias/100/R102.txt'
+#instancia_dir = 'venv/Instancias/TesteDeMesa.txt'
 nome_instancia, max_veiculos, capacidade_veiculos, clientes = ler_instancia(instancia_dir)
 capacidade_veiculos = capacidade_fixa_veiculos
 #----------------------------------#
@@ -50,160 +55,113 @@ p.set_numero_clientes(len(clientes))
 p.set_numero_max_veiculos(max_veiculos)
 p.set_capacidade_veiculo(capacidade_veiculos)
 p.set_dados_cliente(clientes)
-p.set_velocidade_veiculo(velocidade_veiculo_m_s)
+p.set_velocidade_veiculo(velocidade_veiculo_km_h)
 p.set_custo_tranporte_unidade_distancia(custo_transporte_unidade_distancia)
 p.set_custo_veiculo(custo_fixo_veiculo)
 p.set_tempo_servico(tempo_servico_clientes)
 p.att_tempo_servico() #Atualiza o tempo de servico para todos os clientes do problema com exeção da origem
+p.set_qualidade_produto(beta)
+p.set_ciclo_de_vida_produto(T)
+##
+p.att_janelas_de_tempo(1/60)
 
 p.set_w1(w1)
 p.set_w2(w2)
 p.set_w3(w3)
 
-p.print() #Printa Dados da Solução
+p.print() #Printa Dados do Problema
 #----------------------------------#
 
 
 
 
-#----GERANDO-E-PRINTANDO-SOLUÇÂO---#
-solucao1 = p.criando_solucao_fixa()
-instantes1 = p.calcula_instantes_de_entrega_2(solucao1)
-for rota in solucao1:
-    print('----------ROTA-----------')
-    for cliente in rota:
-        print(cliente)
-    print()
+#---------CRIANDO-PROBLEMA---------#
+#n_amostra_clientes = 11
+#p.set_numero_clientes(n_amostra_clientes)
+#p.set_dados_cliente(clientes[:n_amostra_clientes])
+#print(clientes[:n_amostra_clientes])
+#print(len(clientes[:n_amostra_clientes]))
+#p.print()
 #----------------------------------#
 
 
-
-#---GERANDO-E-PRINTANDO-INSTANTES--#
-for i in range(len(solucao1)):
-    rota  = solucao1[i]
-    rota_instantes = instantes1[i]
-    print(f'----------------------------ROTA {i}----------------------------')
-    for j in range( len(rota) ):
-        print(rota[j])
-        print(f'=>t[{j}]={rota_instantes[j]}\n')
-#----------------------------------#
-
-
-
-#---------FUNÇÕES=OBJETIVO---------#
-print("------OBJETIVOS------")
-print(f"OBJ1 :{p.func_obj1(solucao1,instantes1,T)}")
-print(f"OBJ2 :{p.func_obj2(solucao1,instantes1,T)}")
-#----------------------------------#
+# #----GERANDO-E-PRINTANDO-SOLUÇÂO---#
+# solucao1 = p.criando_solucao_aleatoria()
+# instantes1 = p.calcula_instantes_de_entrega_1(solucao1)
+# for rota in solucao1:
+#     print('----------ROTA-----------')
+#     for cliente in rota:
+#         print(cliente)
+#     print()
+# #----------------------------------#
 
 
 
-#--------------KMEANS--------------#
-print("----------------KMeansST----------------")
-kmeans = KmeansST(k1, k2, k3, alpha1, alpha2, velocidade_veiculo_m_s, clientes)
-kmeans.calcular_distancias()
-kmeans.print()
-#kmeans.print_ST()
-demanda_total = p.get_demanda_total()
+# #---GERANDO-E-PRINTANDO-INSTANTES--#
+# for i in range(len(solucao1)):
+#     rota  = solucao1[i]
+#     rota_instantes = instantes1[i]
+#     print(f'----------------------------ROTA {i}----------------------------')
+#     for j in range( len(rota) ):
+#         print(rota[j])
+#         print(f'=>t[{j}]={rota_instantes[j]}')
+#         print(f'=>B[{j}] = B({rota_instantes[j]}) = {p.beta(rota_instantes[j],T)} \n')
+#
+# #----------------------------------#
 
-k_clusters = ceil( p.get_demanda_total()/p.get_capacidade_veiculo())
-clusters = kmeans.executar(k_clusters, lim_iteracoes)
 
-matriz_ST = kmeans.get_matriz_distancias_ST()
 
-#----------------------------------#
+# #---------FUNÇÕES=OBJETIVO---------#
+# print("------OBJETIVOS------")
+# print(f"OBJ1 :{p.func_obj1_alt(solucao1,instantes1)}")
+# print(f"OBJ2 :{p.func_obj2_alt(solucao1,instantes1)}")
+# print(f"OBJ1 :{p.func_obj1(solucao1,instantes1)}")
+# print(f"OBJ2 :{p.func_obj2(solucao1,instantes1)}")
+# #----------------------------------#
 
-#----GERANDO-E-PRINTANDO-SOLUÇÂO---#
-solucao2 = p.criando_solucao_clusterizada(clusters, matriz_ST)
-for rota in solucao2:
-    print('----------ROTA-----------')
-    for cliente in rota:
-        print(cliente)
-    print()
-print(clusters)
-#----------------------------------#
+
+
+# #--------------KMEANS--------------#
+# print("----------------KMeansST----------------")
+# kmeans = KmeansST(k1, k2, k3, alpha1, alpha2, velocidade_veiculo_m_s, clientes)
+# kmeans.calcular_distancias()
+# #kmeans.print()
+# #kmeans.print_ST()
+# demanda_total = p.get_demanda_total()
+#
+# k_clusters = ceil( p.get_demanda_total()/p.get_capacidade_veiculo())
+# clusters = kmeans.executar(k_clusters, lim_iteracoes)
+#
+# matriz_ST = kmeans.get_matriz_distancias_ST()
+#
+# #----------------------------------#
+
+# #----GERANDO-E-PRINTANDO-SOLUÇÂO---#
+# solucao2 = p.criando_solucao_clusterizada(clusters, matriz_ST)
+# instantes2 = p.calcula_instantes_de_entrega_1(solucao2)
+# print(solucao1)
+# print(solucao2)
+# #for rota in solucao2:
+# #    print('----------ROTA-----------')
+# #    for cliente in rota:
+# #        print(cliente)
+# #    print()
+# #print(clusters)
+# print("------OBJETIVOS------")
+# print(f"OBJ1 :{p.func_obj1(solucao2,instantes2)}")
+# print(f"OBJ2 :{p.func_obj2(solucao2,instantes2)}")
+# #----------------------------------#
 
 
 
 #-----------TESTE-PYMOO------------#
-
-rot_pymoo.run()
+numero_geracoes = 100
+tamanho_populacao = 100
+res = algoritmo_pymoo.run(p, numero_geracoes, tamanho_populacao)
 #----------------------------------#
 
 
-
-
-
-#--------TESTES DAS CLASSES--------#
-#print('###########################')
-#solucao2 = p.criando_solucao_aleatoria_3(clientes)
-#for rota in solucao2:
-#    print('----------ROTA-----------')
-#    for cliente in rota:
-#        print(cliente)
-#    print()
-
-
-#print(clientes[0].calcula_distancia_clientes(clientes[1]) )
-
-
-
-#p.set_numero_veiculos(5)
-#p.set_capacidade_veiculo(3)
-#p.set_velocidade_veiculo(4.7)
-#p.set_custo_tranporte_por_km(2.5)
-#p.set_custo_veiculo(3.7)
-
-#p.set_numero_clientes(3)
-#p.set_dados_cliente([['S' , 2 ,3], ["f" , 2 ,3 ]])
-
-#p.set_qualidade_produto(0.4)
-#p.set_ciclo_de_vida_produto(0.3)
-
-#p.set_w1(10)
-#p.set_w2(2)
-#p.set_w3(15)
-
-#p.print()
-
-#p.criando_solucao(10)
-
-#TESTANDO SOLUÇÂO
-#s = Solucao(10)
-
-#rota
-#v1 = [2, 4, 10, 5, 7]
-#v2 = [1, 3, 6]
-#v3 = [8, 11, 9, 12]
-#caminho = []
-#caminho.append(v1)
-#custo_fixo_veiculo = 50.0
-#capacidade_fixa_veiculos = 50
-
-#w1 = 10
-#caminho.append(v2)
-#caminho.append(v3)
-#tam_rota = [len(v1),len(v2), len(v3)]
-#n_veiculos = 3
-
-
-#outros
-#id = 25
-#dist_percorrida = 5.0
-#custo_objetivo = 1.2
-#quali_objetivo = 3.5
-#crow_1 = 10.5
-#crow_2 = 13.5
-
-#s.set_id(id)
-#s.set_tamanho_rota_por_veiculo(tam_rota)
-#s.set_numero_veiculos(n_veiculos)
-#s.set_caminho_da_solucao(caminho)
-#s.set_distancia_percorrida(dist_percorrida)
-#s.set_custo_objetivo1(custo_objetivo)
-#s.set_qualidade_objetivo2(quali_objetivo)
-#s.set_crownding_distance_objetivo1(crow_1)
-#s.set_crownding_distance_objetivo2(crow_2)
-
-#s.print()
-
+#-------------Output---------------#
+print()
+path = "Saida.xlsx"
+write_res(path, p, res)

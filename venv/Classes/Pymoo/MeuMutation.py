@@ -1,10 +1,11 @@
 from pymoo.model.mutation import Mutation
 import numpy as np
+import time
 
 from pymoo.operators.crossover.order_crossover import random_sequence
 
 
-def inversion_mutation(y, seq, inplace=True):
+def mutacao_inversao(y, seq, inplace=True):
     y = y if inplace else np.copy(y)
 
     seq = seq if not None else random_sequence(len(y))
@@ -13,19 +14,25 @@ def inversion_mutation(y, seq, inplace=True):
     y[start:end + 1] = np.flip(y[start:end + 1])
     return y
 
+def mutacao_troca(y, inplace=True):
+    y = y if inplace else np.copy(y)
+
+    i_1 = np.random.randint(len(y))
+    i_2 = np.random.randint(len(y))
+    while i_1 == i_2:
+        i_2 = np.random.randint(len(y))
+
+
+    temp = y[i_1]
+    y[i_1] = y[i_2]
+    y[i_2] = temp
+
+
+    return y
 
 class MeuMutation(Mutation):
 
     def __init__(self, prob=1.0):
-        """
-        This mutation is applied to permutations. It randomly selects a segment of a chromosome and reverse its order.
-        For instance, for the permutation `[1, 2, 3, 4, 5]` the segment can be `[2, 3, 4]` which results in `[1, 4, 3, 2, 5]`.
-        Parameters
-        ----------
-        prob : float
-            Probability to apply the mutation to the individual
-
-        """
         super().__init__()
         self.prob = prob
 
@@ -33,7 +40,8 @@ class MeuMutation(Mutation):
         Y = X.copy()
         for i, y in enumerate(X):
             if np.random.random() < self.prob:
-                seq = random_sequence(len(y))
-                Y[i] = inversion_mutation(y, seq, inplace=True)
+                #seq = random_sequence(int(len(y)/6))
+                #Y[i] = mutacao_inversao(y, seq, inplace=True)
+                Y[i] = mutacao_troca(y, inplace=True)
 
         return Y

@@ -51,21 +51,21 @@ class Cliente:
             return False
 
     def set_janela_inicio(self, janela_inicio):
-        if (type(janela_inicio) is int):
+        if (type(janela_inicio) is int or type(janela_inicio) is float):
             self.__janela_inicio = janela_inicio
             return True
         else:
             return False
 
     def set_janela_fim(self, janela_fim):
-        if (type(janela_fim) is int):
+        if (type(janela_fim) is int or type(janela_fim) is float ):
             self.__janela_fim = janela_fim
             return True
         else:
             return False
 
     def set_tempo_de_servico(self, tempo_de_servico):
-        if (type(tempo_de_servico) is int):
+        if (type(tempo_de_servico) is int or type(tempo_de_servico) is float):
             self.__tempo_de_servico = tempo_de_servico
             return True
         else:
