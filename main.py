@@ -41,7 +41,7 @@ alpha2 = 0.5
 
 
 #----------LENDO-INTANCIA----------#
-instancia_dir = 'venv/Instancias/100/R102.txt'
+instancia_dir = 'venv/Instancias/100/R201.txt'
 #instancia_dir = 'venv/Instancias/TesteDeMesa.txt'
 nome_instancia, max_veiculos, capacidade_veiculos, clientes = ler_instancia(instancia_dir)
 capacidade_veiculos = capacidade_fixa_veiculos
@@ -162,6 +162,6 @@ res = algoritmo_pymoo.run(p, numero_geracoes, tamanho_populacao)
 
 
 #-------------Output---------------#
-print()
+#print()
 path = "Saida.xlsx"
 write_res(path, p, res)

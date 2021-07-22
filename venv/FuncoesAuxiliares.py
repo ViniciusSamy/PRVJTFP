@@ -54,8 +54,8 @@ def write_res(path, p, res):
 
 
 
-    print(res.F.shape)
-    print(n)
+    #print(res.F.shape)
+    #print(n)
 
 
     workbook.close()

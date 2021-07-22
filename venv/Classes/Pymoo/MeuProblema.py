@@ -90,6 +90,21 @@ class MeuRandomSampling(Sampling):
         buscaLocal(X,self.n_buscas, self.problema_externo)
         return X
 
+#SAMPLES
+class RandomSamplingExterno(Sampling):
+    def __init__(self, problema, numero_buscas):
+        self.n_buscas = numero_buscas
+        self.problema_externo = problema
+
+    def _do(self, problem, n_samples, **kwargs):
+        X = np.full((n_samples, problem.n_var), 0, dtype=int)
+        for i in range(n_samples):
+            X[i, :] = np.random.permutation(problem.n_var) + 1
+            #print(X[i])
+
+        buscaLocal(X,self.n_buscas, self.problema_externo)
+        return X
+
 
 #REPAIR
 class StartFromTenRepair(Repair):

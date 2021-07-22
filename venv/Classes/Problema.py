@@ -455,6 +455,8 @@ class Problema:
                 sum_1 += cliente_atual.calcula_distancia_clientes(cliente_proximo) * custo_por_unidade
         print(f"Soma Custo transporte: {sum_1}") #DEBUG
 
+
+
         # -------Soma do custo pelo numero de veiculos alocados-------#
         sum_2 = 0.0 #custo dado o numero de veiculos da solucao
         n_veiculos = len(solucao)
