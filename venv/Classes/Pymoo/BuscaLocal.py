@@ -50,11 +50,15 @@ def buscaLocal(X, num_buscas, problema_externo):
 
     for i in range(len(X)):
 
-        x = np.copy(X[i]) #Copia da solução referencia
-        best = np.copy(x) #Armazena a melhor solução da vizinhaça
-        obj1_best, obj2_best = problema_externo.objs(best) #Armazena os valores objetivos de 'best'
+        # Copia da solução referencia
+        x = np.copy(X[i])
+        # Armazena a melhor solução da vizinhaça
+        best = np.copy(x)
+        # Armazena os valores objetivos de 'best'
+        obj1_best, obj2_best = problema_externo.objs(best)
 
-        pos_pivo = np.random.randint(len(x)) #Elemento pivo aletório
+        # Elemento pivo aletório
+        pos_pivo = np.random.randint(len(x))
 
         for j in range(num_buscas):
             x_temp = np.copy(x) #Armazena o vizinho

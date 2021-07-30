@@ -10,6 +10,7 @@ from Classes.Pymoo.MeuProblema import MeuRandomSampling
 from Classes.Pymoo.MeuProblema import  visualize
 from Classes.Pymoo.MeuCrossover import  MeuCrossover
 from Classes.Pymoo.MeuMutation import MeuMutation
+from Classes.Pymoo.MeuSelection import MeuSelection
 from pymoo.factory import get_termination
 from pymoo.factory import get_performance_indicator
 from Classes.Pymoo.BuscaLocal import BuscaLocalRepair
@@ -35,12 +36,13 @@ def run(p, num_gen, tam_pop):
 
 
     #---N DE EXECUÇÕES---#
-    n_exec = 5
+    n_exec = 1
     #---BUSCA LOCAL---#
     n_buscas = 10 #Numero de buscas locais
     #---CRUZAMENTO---#
     size_corte_cruzamento = 1/2
     n_filhos = 2
+    n_cruzamentos = 10
     #---MUTAÇÃO---#
     prob_mutacao = 0.2
 
@@ -49,15 +51,17 @@ def run(p, num_gen, tam_pop):
 
     algorithm = NSGA2(
         pop_size=tam_pop,
-        n_offsprings=n_filhos ,
+        n_offsprings= tam_pop,
         sampling=MeuRandomSampling(p,n_buscas),
-        crossover=MeuCrossover(size_corte_cruzamento, n_filhos),
+        crossover=MeuCrossover(size_corte_cruzamento, n_offsprings=n_filhos, n_parents=2 ),
         mutation=MeuMutation(prob=prob_mutacao),
         repair= None,
         eliminate_duplicates=True
     )
 
     termination = get_termination("n_gen", num_gen)
+
+
 
     all_results = []
     all_hypervolumes = []

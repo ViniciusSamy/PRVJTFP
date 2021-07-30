@@ -23,6 +23,7 @@ def ler_instancia(instancia_dir):
     nome_instancia = file.readline()
     nome_instancia.rstrip('\n') #Remove quebra de linha do nome caso haja
 
+
     # le linha a linha e se a linha tiver elementos numericos adciona a linha na lista numeros
     numeros = []
     for linha in file:

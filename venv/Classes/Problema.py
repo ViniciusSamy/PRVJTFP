@@ -21,6 +21,7 @@ class Problema:
     __w2 = 0 # [int] Coeficiente de ..
     __w3 = 0 # [int] Coeficiente de ..
 
+
     #-----------CONSTRUTOR------------#
 
 
@@ -436,6 +437,7 @@ class Problema:
     def func_obj1(self, solucao, instantes):
         solucao_cpy =  list(solucao) # copia da solução
 
+
         T = self.get_ciclo_de_vida_produto()
 
         t1=0
@@ -447,7 +449,7 @@ class Problema:
         sum_1 = 0.0 #custo dos veiculos dados os km
         custo_por_unidade = self.get_custo_tranporte_unidade_distancia()  # Custo por unidade percorrida do veiculo
         for i in range(len(solucao_cpy)):
-            rota= solucao[i]
+            rota = solucao[i]
             for j in range(len(rota) - 1):
                 cliente_atual = rota[j]
                 cliente_proximo = rota[j+1]
@@ -581,6 +583,10 @@ class Problema:
         solucao = []
         rota = []
         demanda_rota = 0
+
+
+
+
 
         rota.append(clientes[0])
 

@@ -85,10 +85,12 @@ class MeuRandomSampling(Sampling):
         X = np.full((n_samples, problem.n_var), 0, dtype=int)
         for i in range(n_samples):
             X[i, :] = np.random.permutation(problem.n_var) + 1
-            #print(X[i])
+
 
         buscaLocal(X,self.n_buscas, self.problema_externo)
+        print(f"POP INICIAL ({len(X)})")
         return X
+
 
 #SAMPLES
 class RandomSamplingExterno(Sampling):
@@ -97,6 +99,7 @@ class RandomSamplingExterno(Sampling):
         self.problema_externo = problema
 
     def _do(self, problem, n_samples, **kwargs):
+
         X = np.full((n_samples, problem.n_var), 0, dtype=int)
         for i in range(n_samples):
             X[i, :] = np.random.permutation(problem.n_var) + 1
@@ -106,22 +109,5 @@ class RandomSamplingExterno(Sampling):
         return X
 
 
-#REPAIR
-class StartFromTenRepair(Repair):
 
-    def _do(self, problem, pop, **kwargs):
-        X = pop.get("X")
-        #print(X)
-        I = np.where(X == 10)[1]
-        #print(I)
-        #print("------------------------")
-        #print(I)
-        for k in range(len(X)):
-            i = I[k]
-            x = X[k]
-            _x = np.concatenate([x[i:], x[:i]])
-            pop[k].set("X", _x)
-        #print(pop.get())
-
-        return pop
 

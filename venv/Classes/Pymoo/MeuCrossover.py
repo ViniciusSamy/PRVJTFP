@@ -92,17 +92,26 @@ p. 162–164.
 
 class MeuCrossover(Crossover):
 
-    def __init__(self, tam_corte, n_offsprings, **kwargs):
+
+    def __init__(self, tam_corte, n_parents, n_offsprings, **kwargs):
         self.size_corte = tam_corte
-        super().__init__(2, n_offsprings, **kwargs)
+        super().__init__(n_parents=n_parents, n_offsprings=n_offsprings, **kwargs)
 
     def _do(self, problem, X, **kwargs):
+        #print("CRUZAMENTO")
+
         _, n_matings, n_var = X.shape
         Y = np.full((self.n_offsprings, n_matings, n_var), -1, dtype=int)
 
 
+
         for i in range(n_matings):
             a, b = X[:, i, :]
-            Y[:, i, :] = cruzamento(a, b, self.size_corte)
+            #print("CRUZOU")
+            y1, y2 = cruzamento(a, b, self.size_corte)
+            Y[0, i, :] = y1
+            Y[1, i, :] = y2
 
         return Y
+
+

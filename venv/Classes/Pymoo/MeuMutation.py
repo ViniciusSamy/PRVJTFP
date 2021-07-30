@@ -37,6 +37,7 @@ class MeuMutation(Mutation):
         self.prob = prob
 
     def _do(self, problem, X, **kwargs):
+        #print("MUTAÇAO")
         Y = X.copy()
         for i, y in enumerate(X):
             if np.random.random() < self.prob:
