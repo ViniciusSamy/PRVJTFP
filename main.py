@@ -8,11 +8,6 @@ import numpy as np
 import Classes.Pymoo.rotina_pymoo as algoritmo_pymoo
 from FuncoesAuxiliares import write_res
 
-print("teste")
-print("auhauhauha")
-print("auhauhauha")
-print("auhauhauha")
-
 
 #------------PARAMETROS------------#
 #Problema
