@@ -23,6 +23,7 @@ def mutacao_troca(y, inplace=True):
         i_2 = np.random.randint(len(y))
 
 
+
     temp = y[i_1]
     y[i_1] = y[i_2]
     y[i_2] = temp
@@ -40,9 +41,10 @@ class MeuMutation(Mutation):
         #print("MUTAÇAO")
         Y = X.copy()
         for i, y in enumerate(X):
+
             if np.random.random() < self.prob:
                 #seq = random_sequence(int(len(y)/6))
                 #Y[i] = mutacao_inversao(y, seq, inplace=True)
-                Y[i] = mutacao_troca(y, inplace=True)
+                Y[i] = mutacao_troca(y)
 
         return Y

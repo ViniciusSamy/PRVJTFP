@@ -41,7 +41,7 @@ alpha2 = 0.5
 
 
 #----------LENDO-INTANCIA----------#
-instancia_dir = 'venv/Instancias/100/R102.txt'
+instancia_dir = 'venv/Instancias/100/R101.txt'
 #instancia_dir = 'venv/Instancias/TesteDeMesa.txt'
 nome_instancia, max_veiculos, capacidade_veiculos, clientes = ler_instancia(instancia_dir)
 capacidade_veiculos = capacidade_fixa_veiculos
@@ -85,19 +85,19 @@ p.print() #Printa Dados do Problema
 #----------------------------------#
 
 
-# #----GERANDO-E-PRINTANDO-SOLUÇÂO---#
+#----GERANDO-E-PRINTANDO-SOLUÇÂO---#
 # solucao1 = p.criando_solucao_aleatoria()
-# instantes1 = p.calcula_instantes_de_entrega_1(solucao1)
+# instantes1 = p.calcula_instantes_de_entrega(solucao1)
 # for rota in solucao1:
 #     print('----------ROTA-----------')
 #     for cliente in rota:
 #         print(cliente)
 #     print()
-# #----------------------------------#
+#----------------------------------#
 
 
 
-# #---GERANDO-E-PRINTANDO-INSTANTES--#
+#---GERANDO-E-PRINTANDO-INSTANTES--#
 # for i in range(len(solucao1)):
 #     rota  = solucao1[i]
 #     rota_instantes = instantes1[i]
@@ -107,17 +107,17 @@ p.print() #Printa Dados do Problema
 #         print(f'=>t[{j}]={rota_instantes[j]}')
 #         print(f'=>B[{j}] = B({rota_instantes[j]}) = {p.beta(rota_instantes[j],T)} \n')
 #
-# #----------------------------------#
+#----------------------------------#
 
 
 
-# #---------FUNÇÕES=OBJETIVO---------#
+#---------FUNÇÕES=OBJETIVO---------#
 # print("------OBJETIVOS------")
-# print(f"OBJ1 :{p.func_obj1_alt(solucao1,instantes1)}")
-# print(f"OBJ2 :{p.func_obj2_alt(solucao1,instantes1)}")
+# #print(f"OBJ1 :{p.func_obj1_alt(solucao1,instantes1)}")
+# #print(f"OBJ2 :{p.func_obj2_alt(solucao1,instantes1)}")
 # print(f"OBJ1 :{p.func_obj1(solucao1,instantes1)}")
 # print(f"OBJ2 :{p.func_obj2(solucao1,instantes1)}")
-# #----------------------------------#
+#----------------------------------#
 
 
 
@@ -163,5 +163,5 @@ res = algoritmo_pymoo.run(p, numero_geracoes, tamanho_populacao)
 
 #-------------Output---------------#
 #print()
-path = "Saida.xlsx"
-write_res(path, p, res)
+#path = "Saida.xlsx"
+#write_res(path, p, res)

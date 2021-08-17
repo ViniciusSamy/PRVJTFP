@@ -32,17 +32,26 @@ from pymoo.algorithms.nsga3 import NSGA3
 # tam_pop -> Tamanho da população
 def run(p, num_gen, tam_pop):
 
-    problem = MeuProblema(p) # 'p' = representa um instancia da classe problema
+    # 'p' = representa um instancia da classe problema
+    problem = MeuProblema(p)
 
 
     #---N DE EXECUÇÕES---#
     n_exec = 1
+
     #---BUSCA LOCAL---#
-    n_buscas = 10 #Numero de buscas locais
+    dados_busca_local = {
+        "itrs_vns": 3,
+        "itrs_vnd": 5,
+        "itrs_local": 3,
+        "using_VND" : False
+    }
+
     #---CRUZAMENTO---#
     size_corte_cruzamento = 1/2
     n_filhos = 2
     n_cruzamentos = 10
+
     #---MUTAÇÃO---#
     prob_mutacao = 0.2
 
@@ -51,9 +60,9 @@ def run(p, num_gen, tam_pop):
 
     algorithm = NSGA2(
         pop_size=tam_pop,
-        n_offsprings= tam_pop,
-        sampling=MeuRandomSampling(p,n_buscas),
-        crossover=MeuCrossover(size_corte_cruzamento, n_offsprings=n_filhos, n_parents=2 ),
+        n_offsprings=  tam_pop,
+        sampling=MeuRandomSampling(p,dados_busca_local),
+        crossover=MeuCrossover(size_corte_cruzamento, n_offsprings=2, n_parents=2 ),
         mutation=MeuMutation(prob=prob_mutacao),
         repair= None,
         eliminate_duplicates=True

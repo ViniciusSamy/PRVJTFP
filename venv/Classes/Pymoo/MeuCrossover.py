@@ -104,13 +104,14 @@ class MeuCrossover(Crossover):
         Y = np.full((self.n_offsprings, n_matings, n_var), -1, dtype=int)
 
 
-
+        cont = 0
         for i in range(n_matings):
             a, b = X[:, i, :]
-            #print("CRUZOU")
+            cont += 1
             y1, y2 = cruzamento(a, b, self.size_corte)
             Y[0, i, :] = y1
             Y[1, i, :] = y2
+
 
         return Y
 

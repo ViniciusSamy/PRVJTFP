@@ -31,105 +31,105 @@ class Problema:
         # verifica tipo
         if (type(numero_max_veiculos) is int):
             self.__numero_max_veiculos = numero_max_veiculos
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_capacidade_veiculo(self, capacidade_veiculo):
         # verifica tipo
         if (type(capacidade_veiculo) is int):
             self.__capacidade_veiculo = capacidade_veiculo
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_velocidade_veiculo (self, velocidade_veiculo ):
         # verifica tipo
         if (type(velocidade_veiculo) is float):
             self.__velocidade_veiculo  = velocidade_veiculo
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_custo_tranporte_unidade_distancia (self, custo_tranporte_unidade_distancia ):
         #verifica tipo
         if (type(custo_tranporte_unidade_distancia ) is float ):
             self.__custo_tranporte_unidade_distancia  = custo_tranporte_unidade_distancia
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_custo_veiculo(self, custo_veiculo):
         # verifica tipo
         if (type(custo_veiculo) is float):
             self.__custo_veiculo = custo_veiculo
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_tempo_servico(self, tempo_servico):
         # verifica tipo
         if (type(tempo_servico) is int):
             self.__tempo_servico = tempo_servico
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_numero_clientes(self, numero_clientes):
         # verifica tipo
         if (type(numero_clientes) is int):
             self.__numero_clientes = numero_clientes
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_dados_cliente(self, dados_cliente):
         # verifica tipo
         if (type(dados_cliente) is list):
             self.__dados_cliente = dados_cliente
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_qualidade_produto(self, qualidade_produto):
         # verifica tipo
         if (type(qualidade_produto) is float):
             self.__qualidade_produto = qualidade_produto
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_ciclo_de_vida_produto(self, ciclo_de_vida_produto):
         # verifica tipo
         if (type(ciclo_de_vida_produto) is float):
             self.__ciclo_de_vida_produto = ciclo_de_vida_produto
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_w1(self, w1):
         # verifica tipo
         if (type(w1) is int):
             self.__w1 = w1
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_w2(self, w2):
         # verifica tipo
         if (type(w2) is int):
             self.__w2 = w2
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     def set_w3(self, w3):
         # verifica tipo
         if (type(w3) is int):
             self.__w3 = w3
-            return True;
+            return True
         else:
-            return False;
+            return False
 
     # Uma vez que se setamos o tempo de servico temos que atualizar eles nos dados dos clientes
     def att_tempo_servico(self):
@@ -206,14 +206,17 @@ class Problema:
 
 
 
+
+
     #------------CRIAÇÃO-DE-SOLUÇÕES-----------#
+
     #--------->ALEATORIA
     #Criando Solução Aleatoria respeitando as Demandas
     def criando_solucao_aleatoria(self):
         ##!!!!!!NÂO CONSIDERA DISTÂNCIAS NA GERAÇÃO
         ##!!!!!!!NÃO CONSIDERA JANELAS DE TEMPO NA GERAÇÃO
 
-        clientes_nao_atendidos = list(self.get_dados_cliente()); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+        clientes_nao_atendidos = list(self.get_dados_cliente()) #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
 
         cliente_origem = clientes_nao_atendidos.pop(0) #Retira o primeiro cliente(origem de destribuição) da lista de clientes nao atendidos
 
@@ -231,7 +234,7 @@ class Problema:
 
             #Toda rota começa da origem
             rota.append(cliente_origem)
-            demanda_rota += cliente_origem.get_demanda(); #Origem não possui demanda então continua em 0
+            demanda_rota += cliente_origem.get_demanda() #Origem não possui demanda então continua em 0
 
             # print(clientes_nao_atendidos) #DEBUG
             # print(capacidade_veiculo) #DEGUG
@@ -274,6 +277,7 @@ class Problema:
             #print(rota) #DEBUG
 
         return solucao
+
 
     #--------->CLUSTERIZADO
     #criando solucao a partir dos clusters (KMEANS)
@@ -360,7 +364,7 @@ class Problema:
                     rota.append(dados_clientes[0])
 
 
-                    break;
+                    break
 
             #Remove os clusters que não possuem mais nenhum cliente(vazios)
             self.retirar_clusters_vazios(clusters)
@@ -412,8 +416,8 @@ class Problema:
     #Verifica qual o cluster ainda não visitado mais proximo do ultimo cliente adicionado
     def cluster_mais_proximo(self, indice_cliente, clusters, clusters_percorridos, matriz_distancias):
         min_distancia = float("inf")
-        indice_cluster_min = -1
 
+        indice_cluster_min = -1
         for i in range(len(clusters)):
 
             #Se ainda não foi percorrido
@@ -427,6 +431,7 @@ class Problema:
 
 
         return indice_cluster_min
+
 
 
 
@@ -455,7 +460,7 @@ class Problema:
                 cliente_proximo = rota[j+1]
 
                 sum_1 += cliente_atual.calcula_distancia_clientes(cliente_proximo) * custo_por_unidade
-        print(f"Soma Custo transporte: {sum_1}") #DEBUG
+        #print(f"Soma Custo transporte: {sum_1}") #DEBUG
 
 
 
@@ -464,7 +469,7 @@ class Problema:
         n_veiculos = len(solucao)
         custo_por_veiculo = self.get_custo_veiculo()
         sum_2 = n_veiculos * custo_por_veiculo
-        print(f"Soma numero veiculos: {sum_2}")  # DEBUG
+        #print(f"Soma numero veiculos: {sum_2}")  # DEBUG
 
 
         # -------Soma do custo pelo adiantamento e ultrapassagem das janelas-------#
@@ -495,8 +500,8 @@ class Problema:
         #aplicando coeficientes
         sum_3 = sum_3 * w1
         sum_4 = sum_4 * w2
-        print(f"Soma Adianto(W1): {sum_3}")  # DEBUG
-        print(f"Soma Atraso(W2): {sum_4}")  # DEBUG
+        #print(f"Soma Adianto(W1): {sum_3}")  # DEBUG
+        #print(f"Soma Atraso(W2): {sum_4}")  # DEBUG
         #print(f"t1: {t1}")
         #print(f"t2: {t2}")
 
@@ -516,7 +521,7 @@ class Problema:
                 sum_5 += self.phi(cliente_instante_entrega,T)*cliente_demanda
 
         sum_5 = sum_5*w3
-        print(f"Soma danos(W3):  {sum_5}")  # DEBUG
+        #print(f"Soma danos(W3):  {sum_5}")  # DEBUG
 
         return sum_1+sum_2+sum_3+sum_4+sum_5
 
@@ -562,19 +567,22 @@ class Problema:
 
 
 
-    # ----------OBJETIVOS-ARRAY-NUMPY---------#
+
+
+
+    # ----------FUNÇÕES DE TRATAMENTO DE SOLUÇÕES(USO EXTERNO)---------#
     def objs(self, array_solucao):
 
         solucao = self.converte_array_solucao(array_solucao)
 
-        instantes = self.calcula_instantes_de_entrega_1(solucao)
+        instantes = self.calcula_instantes_de_entrega(solucao)
 
-        obj1 = self.func_obj1_alt(solucao, instantes)
-        obj2 = self.func_obj2_alt(solucao, instantes)
+        obj1 = self.func_obj1(solucao, instantes)
+        obj2 = self.func_obj2(solucao, instantes)
 
         return obj1, obj2
 
-
+    # Conversão padrão
     def converte_array_solucao(self, array_solucao):
 
         clientes = list(self.get_dados_cliente())
@@ -613,12 +621,77 @@ class Problema:
         solucao.append(rota)
         return solucao
 
+    # Conversao considerando uma qualidade minima
+    def converte_array_solucao_Qmin(self, array_solucao):
+
+        clientes = list(self.get_dados_cliente())
+        capacidade_veiculo = self.get_capacidade_veiculo()
+        velocidade = self.__velocidade_veiculo
+        qualidade_min = self.__qualidade_produto
+        T = self.__ciclo_de_vida_produto
+
+        solucao = []
+        rota = []
+        demanda_rota = 0
+
+
+        rota.append(clientes[0])
+        istRota = [0]
+
+        for k in array_solucao:
+
+            cliente = clientes[k]
+            tempo_entre_cli = rota[-1].calcula_distancia_clientes(cliente) / velocidade
+            ult_instante = istRota[-1]
+            ts_anterior = rota[-1].get_tempo_de_servico()
+            istpart_anterior = max(ult_instante, rota[-1].get_janela_inicio() ) + ts_anterior
+            istChegada = istpart_anterior + tempo_entre_cli
+            istAtendimento = max(istChegada, cliente.get_janela_inicio())
+
+            print(f"[{k}] -> {self.beta(istAtendimento,T)} >= {qualidade_min} ({istChegada})", end="")
+            if demanda_rota + cliente.get_demanda() <= capacidade_veiculo and self.beta(istAtendimento,T) >= qualidade_min :
+                rota.append(cliente)
+                demanda_rota += cliente.get_demanda()
+                istRota.append(istChegada)
+                print(" IN")
+
+            else:
+                print(" NOT IN")
+                rota.append(clientes[0])
+                solucao.append(rota)
+
+                rota = []
+                demanda_rota = 0
+                rota.append(clientes[0])
+                istRota = [0]
+
+                rota.append(cliente)
+                demanda_rota += cliente.get_demanda()
+
+        rota.append(clientes[0])
+        solucao.append(rota)
+        return solucao
+
+
+    def converte_solucao_array(self, solucao):
+        list_temp = []
+        for i in range(len(solucao)):
+            for j in range(len(solucao[i])):
+                index_i = solucao[i][j].get_indice()
+                list_temp.append(index_i)
+
+        return np.array(list_temp)
+
+        # Retorna uma lista de lista com os instantes em que os clientes foram atendidos em um dada solucao
+
+
+
     # Retorna uma lista de lista com os instantes em que os clientes foram atendidos em um dada solucao
     # Uma mesma posição(i,j) tanto nos instantes quanto na solução correspondem aos dados de um mesmo cliente
     def calcula_instantes_de_entrega(self, solucao):
         # !!!!!!! PRIMEIRO INSTANTE DA ROTA É IGUAL A JANELA DE TEMPO DO PRIMEIRO CLIENTE
 
-        solucao_copia = list(solucao); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+        solucao_copia = list(solucao) #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
 
 
 
@@ -646,7 +719,7 @@ class Problema:
 
             distancia_clientes = cliente_atual.calcula_distancia_clientes(cliente_anterior) #calcula a distancia entre os clientes
 
-            velocidade_veiculo = self.get_velocidade_veiculo();
+            velocidade_veiculo = self.get_velocidade_veiculo()
 
 
             ##Calcula os instantes de atendimeto de cada cliente da rota
@@ -656,7 +729,7 @@ class Problema:
                 # Adiciona o instante de entrega do cliente anterior
                 instantes_entregas_rota.append(tempo_acumulado)
 
-                # Calcula tempo entre cliente anterior e o atual (CONVERTE VELOCIDADE DE KM/H PARA M/S)
+                # Calcula tempo entre cliente anterior e o atual
                 tempo_entre_clientes = distancia_clientes / (velocidade_veiculo)
 
                 #Calcula o tempo de espera que houve no cliente anterior se houver
@@ -698,6 +771,91 @@ class Problema:
 
         return instantes_entregas_solucao
 
+    def calcula_instante_de_entrega_sucinto(self, solucao):
+        #Cria uma copia da solucao
+        solucao = list(solucao)
+
+        #Estrtura que irá armazenar os intantes da solução
+        instantes_solucao = []
+
+        #Velocidade veiculo
+        velocidade = self.__velocidade_veiculo
+
+        #Percorre rotas
+        for i in range(len(solucao)):
+            rota = solucao[i]
+            instantes_rota = [0]
+
+
+            # Percorre clientes da rota
+            for j in range(len(rota)-1):
+                # Cliente Anterior
+                cliente_anterior = rota[j]
+                #Cliente Atual
+                cliente_atual = rota[j+1]
+
+                #Distancia entre os clientes
+                distancia = cliente_atual.calcula_distancia_clientes(cliente_anterior)
+
+                #Tempo entre clientes
+                tempo = distancia/velocidade
+
+                #Ultimo instante adicionado
+                ult_instante = instantes_rota[-1]
+
+                #Tempo de servico cliente anterior
+                ts_anterior = cliente_anterior.get_tempo_de_servico()
+
+                #Instante de partida do cliente anterior
+                Ipart_anterior = max(ult_instante, cliente_anterior.get_janela_inicio()) + ts_anterior
+
+                #Instante de chegada ao cliente atual
+                Ichegada = Ipart_anterior + tempo
+
+                #Adiciona o instante de chegada
+                instantes_rota.append(Ichegada)
+
+            instantes_solucao.append(instantes_rota)
+
+
+        return instantes_solucao
+
+
+
+
+
+
+
+
+
+
+    #Calcula o valor objetivos de rotas externas[clientes representados como ints]
+    def func_objs(self, solucao_ints):
+
+        solucao = self.repara_rota(solucao_ints)
+
+        instantes = self.calcula_instantes_de_entrega(solucao)
+
+        obj1 = self.func_obj1(solucao, instantes)
+        obj2 = self.func_obj2(solucao, instantes)
+
+        return obj1, obj2
+
+    #Repara as rotas caso a origem ou algum outro cliente esteja represendo por um inteiros
+    def repara_rota(self, solucao):
+
+        clientes = list(self.get_dados_cliente())
+
+        for i in range(len(solucao)):
+
+            for j in range(len(solucao[i])):
+                if type(solucao[i][j]) is int:
+                    index = solucao[i][j]
+                    solucao[i][j] = clientes[index]
+
+
+
+        return solucao
 
 
 
@@ -718,13 +876,26 @@ class Problema:
             f"\nw3 = {self.get_w3()}"
         )
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     ##############################------------FUNCOES PARA TESTE ------------#######################
     def criando_solucao_aleatoria_2(self):
         ##!!!!!!!!!!!PROBLEMA: Não Considerao numero maximo de veiculos
         ##!!!!!!!!!!!PROBLEMA: Não Cosidera a qualidade minima
         ##!!!!!!!!!!!PROBLEMA: Não considera as Janelas de Tempo
 
-        clientes_nao_atendidos = list(self.get_dados_cliente()); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+        clientes_nao_atendidos = list(self.get_dados_cliente()) #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
 
         cliente_origem = clientes_nao_atendidos.pop(0) #Retira o primeiro cliente(origem de destribuição) da lista de lcientes nao atendidos
 
@@ -743,7 +914,7 @@ class Problema:
 
             #Toda rota começa da origem
             rota.append(cliente_origem)
-            demanda_rota += cliente_origem.get_demanda();
+            demanda_rota += cliente_origem.get_demanda()
 
             # print(clientes_nao_atendidos) #DEBUG
             # print(capacidade_veiculo) #DEGUG
@@ -802,7 +973,7 @@ class Problema:
         ##!!!!!!!!!!!PROBLEMA: Não Cosidera a qualidade minima
         ##!!!!!!!!!!!PROBLEMA: Não considera as Janelas de Tempo
 
-        clientes_nao_atendidos = list(clientes); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+        clientes_nao_atendidos = list(clientes) #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
 
         cliente_origem = clientes_nao_atendidos.pop(0) #Retira o primeiro cliente(origem de destribuição) da lista de lcientes nao atendidos
 
@@ -822,7 +993,7 @@ class Problema:
 
             #Toda rota começa da origem
             rota.append(cliente_origem)
-            demanda_rota += cliente_origem.get_demanda();
+            demanda_rota += cliente_origem.get_demanda()
 
             #Tempo corrente da rota
             tempo_acumulado = 0
@@ -953,7 +1124,7 @@ class Problema:
 
 
         #ordenado listas onde os primeiros elementos das listas serao os mais proximos das janelas
-        L_1 #não é ordenado pois obedecem as janelas
+        #L_1 não é ordenado pois obedecem as janelas
         L_2.sort(key=lambda x: x[1]) #ordena a lista pela folga_inicio
         L_3.sort(key=lambda x: x[2]) #ordena a lista pela folga_fim
         L_4.sort(key=lambda x: x[1]+x[2]) #ordena a lis pela folga_inicio + folga_fim
@@ -971,7 +1142,7 @@ class Problema:
 
     def criando_solucao_fixa(self):
 
-        clientes_nao_atendidos = list(self.get_dados_cliente()); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+        clientes_nao_atendidos = list(self.get_dados_cliente()) #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
 
         cliente_origem = clientes_nao_atendidos.pop(0) #Retira o primeiro cliente(origem de destribuição) da lista de clientes nao atendidos
 
@@ -989,7 +1160,7 @@ class Problema:
 
             #Toda rota começa da origem
             rota.append(cliente_origem)
-            demanda_rota += cliente_origem.get_demanda(); #Origem não possui demanda então continua em 0
+            demanda_rota += cliente_origem.get_demanda() #Origem não possui demanda então continua em 0
 
             # print(clientes_nao_atendidos) #DEBUG
             # print(capacidade_veiculo) #DEGUG
@@ -1015,7 +1186,7 @@ class Problema:
                     #Decrementa o iterador toda vez que um cliente é retirado da lista (evita que algum cliente seja pulado)
                     i -= 1
                 else:
-                    break;
+                    break
 
                 #Se a demanda da rota ja atingiu a capacidade maxima do veiculo sai do loop
                 if(demanda_rota == capacidade_veiculo):
@@ -1039,7 +1210,7 @@ class Problema:
     #[PADRÃO]
     def calcula_instantes_de_entrega_1(self, solucao):
 
-        solucao_copia = list(solucao); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+        solucao_copia = list(solucao) #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
         instantes_entregas_solucao = [] #armazena os instantes de entrega de toda a solução
 
 
@@ -1053,7 +1224,7 @@ class Problema:
             tempo_acumulado = 0  # tempo acumulado até o momento
 
 
-            #Estabelecendo os primeiro clientes da rota a tere instantes acumulados
+            #Estabelecendo os primeiro clientes da rota a terem instantes acumulados
             cliente_anterior = rota_clientes_nao_calculados.pop(0)  # pegando primeiro cliente(origem) da rota da iteração e remove ele
             cliente_anterior_t_servico = cliente_anterior.get_tempo_de_servico()  # tempo de serviço do cliente da iteração
             cliente_atual = rota_clientes_nao_calculados.pop(0)  # pegando primeiro cliente(id:1) da rota da iteração e remove ele
@@ -1068,8 +1239,8 @@ class Problema:
                 # Adiciona o instante de entrega do cliente anterior
                 instantes_entregas_rota.append(tempo_acumulado)
 
-                # Calcula tempo entre cliente anterior e o atual (CONVERTE VELOCIDADE DE KM/H PARA M/S)
-                tempo_entre_clientes = distancia_clientes / (velocidade_veiculo)
+                # Calcula tempo entre cliente anterior e o atual
+                tempo_entre_clientes = distancia_clientes / velocidade_veiculo
 
                 #Calcula o tempo de espera que houve no cliente anterior se houver
                 janela_inicio_cliente_anterior = cliente_anterior.get_janela_inicio()
@@ -1120,7 +1291,7 @@ class Problema:
     def calcula_instantes_de_entrega_2(self, solucao):
         # !!!!!!! PRIMEIRO INSTATE DA ROTA É IGUAL A JANELA DE TEMPO DO PRIMEIRO CLIENTE
 
-        solucao_copia = list(solucao); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+        solucao_copia = list(solucao) #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
 
 
 
@@ -1148,7 +1319,7 @@ class Problema:
 
             distancia_clientes = cliente_atual.calcula_distancia_clientes(cliente_anterior) #calcula a distancia entre os clientes
 
-            velocidade_veiculo = self.get_velocidade_veiculo();
+            velocidade_veiculo = self.get_velocidade_veiculo()
 
 
 
@@ -1218,7 +1389,7 @@ class Problema:
     def calcula_instantes_de_entrega_3(self, solucao):
         # !!!!!!! PRIMEIRO INSTANTE DA ROTA É IGUAL A JANELA DE TEMPO DO PRIMEIRO CLIENTE
 
-        solucao_copia = list(solucao); #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
+        solucao_copia = list(solucao) #cria uma copia da lista de clientes, com finalidade de armazenar os clientes nao atendidos
 
 
 
@@ -1246,7 +1417,7 @@ class Problema:
 
             distancia_clientes = cliente_atual.calcula_distancia_clientes(cliente_anterior) #calcula a distancia entre os clientes
 
-            velocidade_veiculo = self.get_velocidade_veiculo();
+            velocidade_veiculo = self.get_velocidade_veiculo()
 
 
             ##Calcula os instantes de atendimeto de cada cliente da rota
@@ -1300,123 +1471,123 @@ class Problema:
 
 
 
-    #Calcula a função objetivo 1 para uma dada solução ( utiliza-se de seus instantes de entrega )
-    def func_obj1_alt(self, solucao, instantes):
-        solucao_cpy =  list(solucao) # copia da solução
-
-        T = self.get_ciclo_de_vida_produto()
-
-        t1=0
-        t2=0
-        t3=0
-
-
-        #-------Soma do custo por unidade percorrida do veiculo-------#
-        sum_1 = 0.0 #custo dos veiculos dados os km
-        custo_por_unidade = self.get_custo_tranporte_unidade_distancia()  # Custo por unidade percorrida do veiculo
-        for i in range(len(solucao_cpy)):
-            rota= solucao[i]
-            for j in range(len(rota) - 1):
-                cliente_atual = rota[j]
-                cliente_proximo = rota[j+1]
-
-                sum_1 += cliente_atual.calcula_distancia_clientes(cliente_proximo) * custo_por_unidade
-        #print(f"Soma Custo transporte: {sum_1}") #DEBUG
-
-
-        # -------Soma do custo pelo numero de veiculos alocados-------#
-        sum_2 = 0.0 #custo dado o numero de veiculos da solucao
-        n_veiculos = len(solucao)
-        custo_por_veiculo = self.get_custo_veiculo()
-        sum_2 = n_veiculos * custo_por_veiculo
-        #print(f"Soma numero veiculos: {sum_2}")  # DEBUG
-
-
-        # -------Soma do custo pelo adiantamento e ultrapassagem das janelas-------#
-        sum_3 = 0.0 #Soma referente ao adiantamento das janelas
-        w1 = self.get_w1() #Coeficiente de adiantamento
-
-        sum_4 = 0.0  # Soma referente a ultrapassagem das janelas
-        w2 = self.get_w2()  # Coeficiente de ultrapassagem
-
-        #Percorre clientes da solução
-        for i in range(len(solucao_cpy)):
-            rota = solucao_cpy[i]
-            for j in range(len(rota) - 1): #Não considera a janela de tempo quando o veiculo volta a origem
-                cliente = rota[j]
-                cliente_janela_inicio = cliente.get_janela_inicio()
-                cliente_janela_fim = cliente.get_janela_fim()
-                cliente_instante_entrega = instantes[i][j]
-
-                sum_3 += 0.0 if (cliente_instante_entrega >= cliente_janela_inicio) else cliente_janela_inicio - cliente_instante_entrega #Só adiciona se houver um adiantamento
-                sum_4 += 0.0 if (cliente_janela_fim >= cliente_instante_entrega) else cliente_instante_entrega - cliente_janela_fim  # Só adiciona se houver uma ultrapassagem
-
-                t1 += 0.0 if (cliente_instante_entrega >= cliente_janela_inicio) else 1
-
-                t2 += 0.0 if (cliente_janela_fim >= cliente_instante_entrega) else 1
-
-
-
-        #aplicando coeficientes
-        sum_3 = (sum_3/1) * w1
-        sum_4 = (sum_4/1) * w2
-        #print(f"Soma Adianto(W1): {sum_3}")  # DEBUG
-        #print(f"Soma Atraso(W2): {sum_4}")  # DEBUG
-        #print(f"t1: {t1}")
-        #print(f"t2: {t2}")
-
-
-        # -------Soma do custo pelos danos aos produtos no instante de entrega-------#
-        sum_5 = 0 #Armazena a soma de danos ao produto
-        w3 = self.get_w3()  # Coeficiente dos danos
-
-        # Percorre clientes da solução
-        for i in range(len(solucao_cpy)):
-            rota = solucao_cpy[i]
-            for j in range(len(rota) - 1):
-                cliente = rota[j]
-                cliente_demanda = cliente.get_demanda()
-                cliente_instante_entrega = max(instantes[i][j],cliente.get_janela_inicio())
-
-                sum_5 += self.phi(cliente_instante_entrega,T)*cliente_demanda
-
-
-        sum_5 = sum_5*w3
-        #print(f"Soma danos(W3):  {sum_5}")  # DEBUG
-
-        return sum_1+sum_2+sum_3+sum_4+sum_5
-
-
-
-
-
-
-
-        ###################OBJ2
-
-    # Calcula a função objetivo 1 para uma dada solução ( utiliza-se de seus instantes de entrega )
-    def func_obj2_alt(self, solucao, instantes  ):
-
-        T = self.get_ciclo_de_vida_produto()
-        dados_cliente = self.__dados_cliente
-
-        numerador = 0.0
-        denominador = 0.0
-
-        for i in range(len(solucao)):
-            rota = solucao[i]
-            rota_instantes = instantes[i]
-
-            for j in range(len(rota)):
-                cliente = rota[j]
-
-                #instante de atendimento é igual a janela de tempo em caso de adiantamento
-                cliente_ti = max(rota_instantes[j],cliente.get_janela_inicio())
-
-                numerador += self.beta(cliente_ti,T) * cliente.get_demanda()
-                #print(f"Sum Freshness: {numerador}")
-                denominador += cliente.get_demanda()
-
-
-        obj2 = numerador/denominador
-        return obj2
+    # #Calcula a função objetivo 1 para uma dada solução ( utiliza-se de seus instantes de entrega )
+    # def func_obj1_alt(self, solucao, instantes):
+    #     solucao_cpy =  list(solucao) # copia da solução
+    #
+    #     T = self.get_ciclo_de_vida_produto()
+    #
+    #     t1=0
+    #     t2=0
+    #     t3=0
+    #
+    #
+    #     #-------Soma do custo por unidade percorrida do veiculo-------#
+    #     sum_1 = 0.0 #custo dos veiculos dados os km
+    #     custo_por_unidade = self.get_custo_tranporte_unidade_distancia()  # Custo por unidade percorrida do veiculo
+    #     for i in range(len(solucao_cpy)):
+    #         rota= solucao[i]
+    #         for j in range(len(rota) - 1):
+    #             cliente_atual = rota[j]
+    #             cliente_proximo = rota[j+1]
+    #
+    #             sum_1 += cliente_atual.calcula_distancia_clientes(cliente_proximo) * custo_por_unidade
+    #     #print(f"Soma Custo transporte: {sum_1}") #DEBUG
+    #
+    #
+    #     # -------Soma do custo pelo numero de veiculos alocados-------#
+    #     sum_2 = 0.0 #custo dado o numero de veiculos da solucao
+    #     n_veiculos = len(solucao)
+    #     custo_por_veiculo = self.get_custo_veiculo()
+    #     sum_2 = n_veiculos * custo_por_veiculo
+    #     #print(f"Soma numero veiculos: {sum_2}")  # DEBUG
+    #
+    #
+    #     # -------Soma do custo pelo adiantamento e ultrapassagem das janelas-------#
+    #     sum_3 = 0.0 #Soma referente ao adiantamento das janelas
+    #     w1 = self.get_w1() #Coeficiente de adiantamento
+    #
+    #     sum_4 = 0.0  # Soma referente a ultrapassagem das janelas
+    #     w2 = self.get_w2()  # Coeficiente de ultrapassagem
+    #
+    #     #Percorre clientes da solução
+    #     for i in range(len(solucao_cpy)):
+    #         rota = solucao_cpy[i]
+    #         for j in range(len(rota) - 1): #Não considera a janela de tempo quando o veiculo volta a origem
+    #             cliente = rota[j]
+    #             cliente_janela_inicio = cliente.get_janela_inicio()
+    #             cliente_janela_fim = cliente.get_janela_fim()
+    #             cliente_instante_entrega = instantes[i][j]
+    #
+    #             sum_3 += 0.0 if (cliente_instante_entrega >= cliente_janela_inicio) else cliente_janela_inicio - cliente_instante_entrega #Só adiciona se houver um adiantamento
+    #             sum_4 += 0.0 if (cliente_janela_fim >= cliente_instante_entrega) else cliente_instante_entrega - cliente_janela_fim  # Só adiciona se houver uma ultrapassagem
+    #
+    #             t1 += 0.0 if (cliente_instante_entrega >= cliente_janela_inicio) else 1
+    #
+    #             t2 += 0.0 if (cliente_janela_fim >= cliente_instante_entrega) else 1
+    #
+    #
+    #
+    #     #aplicando coeficientes
+    #     sum_3 = (sum_3/1) * w1
+    #     sum_4 = (sum_4/1) * w2
+    #     #print(f"Soma Adianto(W1): {sum_3}")  # DEBUG
+    #     #print(f"Soma Atraso(W2): {sum_4}")  # DEBUG
+    #     #print(f"t1: {t1}")
+    #     #print(f"t2: {t2}")
+    #
+    #
+    #     # -------Soma do custo pelos danos aos produtos no instante de entrega-------#
+    #     sum_5 = 0 #Armazena a soma de danos ao produto
+    #     w3 = self.get_w3()  # Coeficiente dos danos
+    #
+    #     # Percorre clientes da solução
+    #     for i in range(len(solucao_cpy)):
+    #         rota = solucao_cpy[i]
+    #         for j in range(len(rota) - 1):
+    #             cliente = rota[j]
+    #             cliente_demanda = cliente.get_demanda()
+    #             cliente_instante_entrega = max(instantes[i][j],cliente.get_janela_inicio())
+    #
+    #             sum_5 += self.phi(cliente_instante_entrega,T)*cliente_demanda
+    #
+    #
+    #     sum_5 = sum_5*w3
+    #     #print(f"Soma danos(W3):  {sum_5}")  # DEBUG
+    #
+    #     return sum_1+sum_2+sum_3+sum_4+sum_5
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #     ###################OBJ2
+    #
+    # # Calcula a função objetivo 1 para uma dada solução ( utiliza-se de seus instantes de entrega )
+    # def func_obj2_alt(self, solucao, instantes  ):
+    #
+    #     T = self.get_ciclo_de_vida_produto()
+    #     dados_cliente = self.__dados_cliente
+    #
+    #     numerador = 0.0
+    #     denominador = 0.0
+    #
+    #     for i in range(len(solucao)):
+    #         rota = solucao[i]
+    #         rota_instantes = instantes[i]
+    #
+    #         for j in range(len(rota)):
+    #             cliente = rota[j]
+    #
+    #             #instante de atendimento é igual a janela de tempo em caso de adiantamento
+    #             cliente_ti = max(rota_instantes[j],cliente.get_janela_inicio())
+    #
+    #             numerador += self.beta(cliente_ti,T) * cliente.get_demanda()
+    #             #print(f"Sum Freshness: {numerador}")
+    #             denominador += cliente.get_demanda()
+    #
+    #
+    #     obj2 = numerador/denominador
+    #     return obj2

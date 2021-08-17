@@ -4,7 +4,7 @@ from pymoo.model.sampling import Sampling
 from pymoo.model.repair import Repair
 from scipy.spatial.distance import pdist, squareform, cdist
 from pymoo.model.problem import Problem
-from Classes.Pymoo.BuscaLocal import buscaLocal, sleep
+from Classes.Pymoo.BuscaLocal import BuscaLocal
 
 
 class MeuProblema(Problem):
@@ -77,9 +77,16 @@ def visualize(solution, fig=None, ax=None, show=True, label=True):
 
 #SAMPLES
 class MeuRandomSampling(Sampling):
-    def __init__(self, problema, numero_buscas):
-        self.n_buscas = numero_buscas
+
+
+    def __init__(self, problema, dados_busca):
         self.problema_externo = problema
+
+        itrs_vns = dados_busca["itrs_vns"]
+        itrs_vnd = dados_busca["itrs_vnd"]
+        itrs_local = dados_busca["itrs_local"]
+        using_VND = dados_busca["using_VND"]
+        self.BL = BuscaLocal(itrs_vns, itrs_vnd, itrs_local, using_VND, problema)
 
     def _do(self, problem, n_samples, **kwargs):
         X = np.full((n_samples, problem.n_var), 0, dtype=int)
@@ -87,7 +94,9 @@ class MeuRandomSampling(Sampling):
             X[i, :] = np.random.permutation(problem.n_var) + 1
 
 
-        buscaLocal(X,self.n_buscas, self.problema_externo)
+        #Executa busca local
+        #self.BL.run(X)
+
         print(f"POP INICIAL ({len(X)})")
         return X
 
@@ -105,7 +114,7 @@ class RandomSamplingExterno(Sampling):
             X[i, :] = np.random.permutation(problem.n_var) + 1
             #print(X[i])
 
-        buscaLocal(X,self.n_buscas, self.problema_externo)
+        #buscaLocal(X,self.n_buscas, self.problema_externo)
         return X
 
 
