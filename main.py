@@ -8,7 +8,7 @@ import numpy as np
 import Classes.Pymoo.rotina_pymoo as algoritmo_pymoo
 from FuncoesAuxiliares import write_res
 
-
+print("teste")
 
 #------------PARAMETROS------------#
 #Problema
