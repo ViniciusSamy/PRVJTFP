@@ -30,14 +30,8 @@ from pymoo.algorithms.nsga3 import NSGA3
 # p -> Intância da Classe Problema
 # num_gen -> Inteiro com numero de gerações
 # tam_pop -> Tamanho da população
-def run(p, num_gen, tam_pop):
+def run(p, num_gen, tam_pop, n_exec):
 
-    # 'p' = representa um instancia da classe problema
-    problem = MeuProblema(p)
-
-
-    #---N DE EXECUÇÕES---#
-    n_exec = 1
 
     #---BUSCA LOCAL---#
     dados_busca_local = {
@@ -56,8 +50,7 @@ def run(p, num_gen, tam_pop):
     prob_mutacao = 0.2
 
 
-
-
+    problem = MeuProblema(p)
     algorithm = NSGA2(
         pop_size=tam_pop,
         n_offsprings=  tam_pop,
@@ -82,22 +75,20 @@ def run(p, num_gen, tam_pop):
             seed=None
         )
 
-        #Printando Resultados
-        #print(res.X)
-        print(f"i={i+1}:{res.F}")
-
-
-
-        #Calculando hypervolume
+        # Calculando hypervolume
         result = np.copy(res.F)
-        # convertendo função obj2 para valores positivos
-        for i in range(result.shape[0]):
+        for i in range(result.shape[0]):  # convertendo função obj2 para valores positivos
             result[i][1] = result[i][1] * -1
+
 
 
         hv = get_performance_indicator("hv", ref_point=np.array([6000, 2.0]))
         hv_value = hv.calc(result)
-        print("hv", hv_value)
+
+        # Printando Resultados
+        # print(res.X)
+        print(f"i={i + 1}:{res.F}")
+        print("hv = ", hv_value)
 
 
 
@@ -108,27 +99,20 @@ def run(p, num_gen, tam_pop):
 
 
 
-    # # convertendo função obj2 para valores positivos
-    # for i in range(result.shape[0]):
-    #     result[i][1] = result[i][1] * -1
-    # Scatter(legend=True).add(result, label="Pareto-front").show()
-    #
-    # hv = get_performance_indicator("hv", ref_point=np.array([6000, 2.0]))
-    # print("hv", hv.calc(result))
-
     # printando resultados
     figure = Scatter(legend=True)
     for i in range(len(all_results)):
        figure.add(all_results[i], label=f"Simulação {i+1}")
-    figure.show()
-
+    #figure.show()
 
 
     all_results = np.array(all_results)
     all_hypervolumes = np.array(all_hypervolumes)
 
+    print ("####### ROTINA #######")
     print(repr(all_results))
     print(repr(all_hypervolumes))
+    print("#######################")
 
 
-    return res
+    return all_results, all_hypervolumes

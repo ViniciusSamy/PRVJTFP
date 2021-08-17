@@ -79,6 +79,7 @@ class BuscaLocal():
 
 
     def run(self, X):
+        print( "INICIO BUSCA LOCAL")
 
 
         for i in range(len(X)):
@@ -97,6 +98,8 @@ class BuscaLocal():
 
             #Armazena a melhor solução
             X[i] = x_array_best
+
+        print("FIM BUSCA LOCAL")
 
     #METODO PARA AVALIAÇÃO DAs SOLUÇÔES
     def is_better(self, rota_ref, rota_in):

@@ -6,7 +6,7 @@ from Classes.KmeansST import KmeansST
 from math import ceil
 import numpy as np
 import Classes.Pymoo.rotina_pymoo as algoritmo_pymoo
-from FuncoesAuxiliares import write_res
+from FuncoesAuxiliares import write_multi
 
 
 #------------PARAMETROS------------#
@@ -39,37 +39,37 @@ alpha2 = 0.5
 
 
 
-#----------LENDO-INTANCIA----------#
-instancia_dir = 'venv/Instancias/100/R101.txt'
-#instancia_dir = 'venv/Instancias/TesteDeMesa.txt'
-nome_instancia, max_veiculos, capacidade_veiculos, clientes = ler_instancia(instancia_dir)
-capacidade_veiculos = capacidade_fixa_veiculos
-#----------------------------------#
-
-
-
-#---------CRIANDO-PROBLEMA---------#
-p = Problema()
-p.set_numero_clientes(len(clientes))
-p.set_numero_max_veiculos(max_veiculos)
-p.set_capacidade_veiculo(capacidade_veiculos)
-p.set_dados_cliente(clientes)
-p.set_velocidade_veiculo(velocidade_veiculo_km_h)
-p.set_custo_tranporte_unidade_distancia(custo_transporte_unidade_distancia)
-p.set_custo_veiculo(custo_fixo_veiculo)
-p.set_tempo_servico(tempo_servico_clientes)
-p.att_tempo_servico() #Atualiza o tempo de servico para todos os clientes do problema com exeção da origem
-p.set_qualidade_produto(beta)
-p.set_ciclo_de_vida_produto(T)
-##
-p.att_janelas_de_tempo(1/60)
-
-p.set_w1(w1)
-p.set_w2(w2)
-p.set_w3(w3)
-
-p.print() #Printa Dados do Problema
-#----------------------------------#
+# #----------LENDO-INTANCIA----------#
+# instancia_dir = 'venv/Instancias/100/R101.txt'
+# #instancia_dir = 'venv/Instancias/TesteDeMesa.txt'
+# nome_instancia, max_veiculos, capacidade_veiculos, clientes = ler_instancia(instancia_dir)
+# capacidade_veiculos = capacidade_fixa_veiculos
+# #----------------------------------#
+#
+#
+#
+# #---------CRIANDO-PROBLEMA---------#
+# p = Problema()
+# p.set_numero_clientes(len(clientes))
+# p.set_numero_max_veiculos(max_veiculos)
+# p.set_capacidade_veiculo(capacidade_veiculos)
+# p.set_dados_cliente(clientes)
+# p.set_velocidade_veiculo(velocidade_veiculo_km_h)
+# p.set_custo_tranporte_unidade_distancia(custo_transporte_unidade_distancia)
+# p.set_custo_veiculo(custo_fixo_veiculo)
+# p.set_tempo_servico(tempo_servico_clientes)
+# p.att_tempo_servico() #Atualiza o tempo de servico para todos os clientes do problema com exeção da origem
+# p.set_qualidade_produto(beta)
+# p.set_ciclo_de_vida_produto(T)
+# ##
+# p.att_janelas_de_tempo(1/60)
+#
+# p.set_w1(w1)
+# p.set_w2(w2)
+# p.set_w3(w3)
+#
+# p.print() #Printa Dados do Problema
+# #----------------------------------#
 
 
 
@@ -153,14 +153,67 @@ p.print() #Printa Dados do Problema
 
 
 
-#-----------TESTE-PYMOO------------#
-numero_geracoes = 100
-tamanho_populacao = 100
-res = algoritmo_pymoo.run(p, numero_geracoes, tamanho_populacao)
-#----------------------------------#
+# #-----------TESTE-PYMOO------------#
+# numero_geracoes = 100
+# tamanho_populacao = 100
+# numero_de_execucoes = 1
+# res , hypervolumes = algoritmo_pymoo.run(p, numero_geracoes, tamanho_populacao, numero_de_execucoes)
+# #----------------------------------#
+#
+#
+# #-------------Output---------------#
+# print()
+# path = "../../Documentos/UFOP/IC/Resultados/SemVNS/Saida.xlsx"
+# write_res(path, p, res, instancia_dir)
 
 
-#-------------Output---------------#
-#print()
-#path = "Saida.xlsx"
-#write_res(path, p, res)
+#-------RODANDO VARIAS INSTANCIAS-------#
+instancias = [ "R101", "R102", "R103", "R104", "R105", "R106", "R107", "R108", "R109", "R110", "R111" ]
+n_clientes = "100"
+
+for instancia in instancias:
+    # ----------LENDO-INTANCIA----------#
+    instancia_dir = f'venv/Instancias/{n_clientes}/{instancia}.txt'
+    # instancia_dir = 'venv/Instancias/TesteDeMesa.txt'
+    nome_instancia, max_veiculos, capacidade_veiculos, clientes = ler_instancia(instancia_dir)
+    capacidade_veiculos = capacidade_fixa_veiculos
+    # ----------------------------------#
+
+    # ---------CRIANDO-PROBLEMA---------#
+    p = Problema()
+    p.set_numero_clientes(len(clientes))
+    p.set_numero_max_veiculos(max_veiculos)
+    p.set_capacidade_veiculo(capacidade_veiculos)
+    p.set_dados_cliente(clientes)
+    p.set_velocidade_veiculo(velocidade_veiculo_km_h)
+    p.set_custo_tranporte_unidade_distancia(custo_transporte_unidade_distancia)
+    p.set_custo_veiculo(custo_fixo_veiculo)
+    p.set_tempo_servico(tempo_servico_clientes)
+    p.att_tempo_servico()  # Atualiza o tempo de servico para todos os clientes do problema com exeção da origem
+    p.set_qualidade_produto(beta)
+    p.set_ciclo_de_vida_produto(T)
+    ##
+    p.att_janelas_de_tempo(1 / 60)
+
+    p.set_w1(w1)
+    p.set_w2(w2)
+    p.set_w3(w3)
+
+    #p.print()  # Printa Dados do Problema
+    # ----------------------------------#
+
+
+    print(f"INSTANCIA: {instancia}")
+    numero_geracoes = 30
+    tamanho_populacao = 30
+    numero_de_execucoes = 2
+    all_res, all_hypervolumes = algoritmo_pymoo.run(p, numero_geracoes, tamanho_populacao, numero_de_execucoes)
+
+    print("################################")
+    #print(all_res.shape)
+    #print(all_res)
+    #print(all_hypervolumes.shape)
+    #print(all_hypervolumes)
+
+    path = f"../../Documentos/UFOP/IC/Resultados/SemVNS/{instancia}.xlsx"
+    write_multi(path, p, numero_geracoes, tamanho_populacao, numero_de_execucoes, all_res, all_hypervolumes, instancia_dir)
