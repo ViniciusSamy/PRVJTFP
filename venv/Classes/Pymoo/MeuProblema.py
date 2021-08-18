@@ -101,22 +101,29 @@ class MeuRandomSampling(Sampling):
         return X
 
 
+
 #SAMPLES
-class RandomSamplingExterno(Sampling):
-    def __init__(self, problema, numero_buscas):
-        self.n_buscas = numero_buscas
+class MeuRandomSamplingExterno(Sampling):
+
+
+    def __init__(self, problema, dados_busca):
         self.problema_externo = problema
 
+        itrs_vns = dados_busca["itrs_vns"]
+        itrs_vnd = dados_busca["itrs_vnd"]
+        itrs_local = dados_busca["itrs_local"]
+        using_VND = dados_busca["using_VND"]
+        self.BL = BuscaLocal(itrs_vns, itrs_vnd, itrs_local, using_VND, problema)
+
+
     def _do(self, problem, n_samples, **kwargs):
+        X = self.problema_externo.gerar_n_solucoes(n_samples)
 
-        X = np.full((n_samples, problem.n_var), 0, dtype=int)
-        for i in range(n_samples):
-            X[i, :] = np.random.permutation(problem.n_var) + 1
-            #print(X[i])
+        assert (n_samples == X.shape[0])
+        assert (problem.n_var == X.shape[1])
 
-        #buscaLocal(X,self.n_buscas, self.problema_externo)
+        #Executa busca local
+        #self.BL.run(X)
+
+        print(f"POP INICIAL ({len(X)})")
         return X
-
-
-
-

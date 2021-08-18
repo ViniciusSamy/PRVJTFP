@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from Classes.KmeansST import KmeansST
 from Classes.Cliente import Cliente
 
 class Problema:
@@ -20,6 +21,15 @@ class Problema:
     __w1 = 0 # [int] Coeficiente de ..
     __w2 = 0 # [int] Coeficiente de ..
     __w3 = 0 # [int] Coeficiente de ..
+
+    #----Dados Kmeans---#
+    __k_clusters = 0        # [int] numero de clusters gerados
+    __lim_iteracoes = -1    # [int] limite de interações (-1)->Sem limite
+    __k1 = 0.0              # [float] parametro usado para o calculo do tempo salvo quando medimos o tempo entre dois clientes
+    __k2 = 0.0              # [float] parametro usado para o calculo do tempo salvo quando medimos o tempo entre dois clientes
+    __k3 = 0.0              # [float] parametro usado para o calculo do tempo salvo quando medimos o tempo entre dois clientes
+    __alpha1 = 0.0          # [float] Coeficiente que atribui peso para a distância espacial
+    __alpha2 = 0.0          # [float] Coeficiente que atribui peso para a distância temporal
 
 
     #-----------CONSTRUTOR------------#
@@ -131,6 +141,63 @@ class Problema:
         else:
             return False
 
+    def set_k1_kmeans(self, k1):
+        # verifica tipo
+        if (type(k1) is float):
+            self.__k1 = k1
+            return True;
+        else:
+            return False;
+
+    def set_k2_kmeans(self, k2):
+        # verifica tipo
+        if (type(k2) is float):
+            self.__k2 = k2
+            return True;
+        else:
+            return False;
+
+    def set_k3_kmeans(self, k3):
+        # verifica tipo
+        if (type(k3) is float):
+            self.__k3 = k3
+            return True;
+        else:
+            return False;
+
+    def set_alpha1_kmeans(self, alpha1):
+        # verifica tipo
+        if (type(alpha1) is float):
+            self.__alpha1 = alpha1
+            return True;
+        else:
+            return False;
+
+    def set_alpha2_kmeans(self, alpha2):
+        # verifica tipo
+        if (type(alpha2) is float):
+            self.__alpha2 = alpha2
+            return True;
+        else:
+            return False;
+
+    def set_k_clusters_kmeans(self, k_clusters):
+        # verifica tipo
+        if (type(k_clusters) is int):
+            self.__k_clusters = k_clusters
+            return True
+        else:
+            return False
+
+    def set_lim_kmeans(self, lim_iteracoes=-1):
+        # verifica tipo
+        if (type(lim_iteracoes) is int):
+            self.__lim_iteracoes  = lim_iteracoes
+            return True
+        else:
+            return False
+
+
     # Uma vez que se setamos o tempo de servico temos que atualizar eles nos dados dos clientes
     def att_tempo_servico(self):
         clientes = self.get_dados_cliente()
@@ -202,6 +269,27 @@ class Problema:
             demanda_total += cliente.get_demanda()
 
         return  demanda_total
+
+    def get_k1_kmeans(self):
+        return self.__k1
+
+    def get_k2_kmeans(self):
+        return self.__k2
+
+    def get_k3_kmeans(self):
+        return self.__k3
+
+    def get_alpha1_kmeans(self):
+        return self.__alpha1
+
+    def get_alpha2_kmeans(self):
+        return self.__alpha2
+
+    def get_k_clusters_kmeans(self):
+        return self.__k_clusters
+
+    def get_lim_kmeans(self):
+        return self.__lim_iteracoes
 
 
 
@@ -281,7 +369,32 @@ class Problema:
 
     #--------->CLUSTERIZADO
     #criando solucao a partir dos clusters (KMEANS)
-    def criando_solucao_clusterizada(self, clusters, matriz_distancias):
+    def criando_solucao_clusterizada(self):
+        k1 = self.__k1
+        k2 = self.__k2
+        k3 = self.__k3
+        alpha1 = self.__alpha1
+        alpha2 = self.__alpha2
+        lim_itr = self.__lim_iteracoes
+        k_clusters = self.__k_clusters
+        velocidade = self.__velocidade_veiculo
+        clientes = self.__dados_cliente
+
+
+        kmeans = KmeansST(k1, k2, k3, alpha1, alpha2, velocidade, clientes)
+        kmeans.calcular_distancias()
+        clusters = kmeans.executar(k_clusters, lim_itr)
+
+        matriz_distancias = kmeans.get_matriz_distancias_ST()
+
+
+
+
+
+
+
+
+
         dados_clientes = self.__dados_cliente
         capacidade_veiculo = self.get_capacidade_veiculo()
 
@@ -673,18 +786,21 @@ class Problema:
         return solucao
 
 
-    def converte_solucao_array(self, solucao):
+    def converte_solucao_array(self, solucao, remover_origem = False):
         list_temp = []
         for i in range(len(solucao)):
             for j in range(len(solucao[i])):
                 index_i = solucao[i][j].get_indice()
                 list_temp.append(index_i)
 
-        return np.array(list_temp)
+
+        solucao = np.array(list_temp)
+        if remover_origem:
+            solucao = solucao[solucao != 0]
+
+        return solucao
 
         # Retorna uma lista de lista com os instantes em que os clientes foram atendidos em um dada solucao
-
-
 
     # Retorna uma lista de lista com os instantes em que os clientes foram atendidos em um dada solucao
     # Uma mesma posição(i,j) tanto nos instantes quanto na solução correspondem aos dados de um mesmo cliente
@@ -821,6 +937,29 @@ class Problema:
         return instantes_solucao
 
 
+    def gerar_n_solucoes(self, n_solucoes, eliminar_duplicatas=True):
+
+        solucoes = []
+        i = 0 #n de solucoes criadas
+        #metodo_de_geracao = self.criando_solucao_aleatoria
+        metodo_de_geracao = self.criando_solucao_clusterizada
+
+
+        while(i < n_solucoes ):
+            solucao  = metodo_de_geracao()
+
+            if not( (solucao in solucoes) and eliminar_duplicatas ):
+                i += 1
+                solucoes.append(solucao)
+
+
+        #Converte formato de uma solucao (list-> npArray)
+        for i in range(len(solucoes)):
+            solucoes[i] = self.converte_solucao_array(solucoes[i], remover_origem=True)
+
+        solucoes = np.array(solucoes)
+        return solucoes
+
 
 
 
@@ -874,6 +1013,13 @@ class Problema:
             f"\nw1 = {self.get_w1()}"
             f"\nw2 = {self.get_w2()}"
             f"\nw3 = {self.get_w3()}"
+            f"\nk1 (KMEANS) = {self.get_k1_kmeans()}"
+            f"\nk2 (KMEANS) = {self.get_k2_kmeans()}"
+            f"\nk3 (KMEANS) = {self.get_k3_kmeans()}"
+            f"\nalpha1 (KMEANS) = {self.get_alpha1_kmeans()}"
+            f"\nalpha2 (KMEANS) = {self.get_alpha2_kmeans()}"
+            f"\nnumero_clusters (KMEANS) = {self.get_k_clusters_kmeans()}"
+            f"\nlimite_iteracoes (KMEANS) = {self.get_lim_kmeans()}"
         )
 
 

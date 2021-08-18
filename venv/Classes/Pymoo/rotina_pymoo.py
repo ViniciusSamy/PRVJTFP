@@ -6,7 +6,7 @@ from pymoo.factory import get_algorithm, get_crossover, get_mutation, get_sampli
 from pymoo.problems.single.traveling_salesman import create_random_tsp_problem
 from pymoo.util.termination.default import SingleObjectiveDefaultTermination
 from Classes.Pymoo.MeuProblema import MeuProblema
-from Classes.Pymoo.MeuProblema import MeuRandomSampling
+from Classes.Pymoo.MeuProblema import MeuRandomSamplingExterno
 from Classes.Pymoo.MeuProblema import  visualize
 from Classes.Pymoo.MeuCrossover import  MeuCrossover
 from Classes.Pymoo.MeuMutation import MeuMutation
@@ -50,21 +50,22 @@ def run(p, num_gen, tam_pop, n_exec):
     prob_mutacao = 0.2
 
 
+    #-----DEFININDO NSGA2------#
     problem = MeuProblema(p)
     algorithm = NSGA2(
         pop_size=tam_pop,
         n_offsprings=  tam_pop,
-        sampling=MeuRandomSampling(p,dados_busca_local),
+        sampling=MeuRandomSamplingExterno(p,dados_busca_local),
         crossover=MeuCrossover(size_corte_cruzamento, n_offsprings=2, n_parents=2 ),
         mutation=MeuMutation(prob=prob_mutacao),
         repair= None,
         eliminate_duplicates=True
     )
-
     termination = get_termination("n_gen", num_gen)
+    #------------------------------------------------------------------------------#
 
 
-
+    #------------EXECUTA O ALGORITMO N VEZES-------------#
     all_results = []
     all_hypervolumes = []
     for i in range(n_exec):
@@ -90,9 +91,6 @@ def run(p, num_gen, tam_pop, n_exec):
         print(f"i={i + 1}:{res.F}")
         print("hv = ", hv_value)
 
-
-
-
         #salvando resultado e hiper-volume
         all_results.append(result)
         all_hypervolumes.append(hv_value)
@@ -103,16 +101,11 @@ def run(p, num_gen, tam_pop, n_exec):
     figure = Scatter(legend=True)
     for i in range(len(all_results)):
        figure.add(all_results[i], label=f"Simulação {i+1}")
-    #figure.show()
+    figure.show()
 
 
     all_results = np.array(all_results)
     all_hypervolumes = np.array(all_hypervolumes)
-
-    print ("####### ROTINA #######")
-    print(repr(all_results))
-    print(repr(all_hypervolumes))
-    print("#######################")
 
 
     return all_results, all_hypervolumes
